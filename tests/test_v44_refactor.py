@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+from dataclasses import replace
 
 from fastapi.testclient import TestClient
 
@@ -23,15 +24,34 @@ def _profile(**values):
 
 def test_overdue_review_date_does_not_change_user_result(settings):
     repo = JsonRuleRepository(settings.rules_dir, settings.questions_path)
-    rule = next(rule for rule in repo.active_rules(date(2026, 9, 28)) if rule.program_id == "calfresh")
-    assert rule.review_overdue(date(2026, 9, 28)) is True
-    result = EligibilityEngine(today_provider=lambda: date(2026, 9, 28)).evaluate(
-        _profile(zip_code="92101", household_size=1, monthly_income=1200, student_half_time="no"),
-        rule,
+
+    rule = next(
+        rule
+        for rule in repo.active_rules(date(2026, 9, 28))
+        if rule.program_id == "calfresh"
     )
+
+    # Make the review date deliberately overdue for this test.
+    # This keeps the test independent from the real rule metadata.
+    overdue_rule = replace(rule, review_due="2026-09-15")
+
+    assert overdue_rule.review_overdue(date(2026, 9, 28)) is True
+
+    result = EligibilityEngine(
+        today_provider=lambda: date(2026, 9, 28)
+    ).evaluate(
+        _profile(
+            zip_code="92101",
+            household_size=1,
+            monthly_income=1200,
+            student_half_time="no",
+        ),
+        overdue_rule,
+    )
+
+    # An overdue internal review must NOT change the user's eligibility result.
     assert result.status is EligibilityStatus.LIKELY_ELIGIBLE
     assert result.requirements
-
 
 def test_overdue_review_date_is_not_a_user_maintenance_group(settings):
     app = create_app(settings)
@@ -62,21 +82,48 @@ def test_public_results_hide_internal_rule_dates(settings):
     assert "effective 2025" not in page.text.lower()
 
 
-def test_staff_rules_show_internal_review_warning(settings):
+def test_staff_rules_show_internal_review_warning(settings, monkeypatch):
+    from app.domain.eligibility import ProgramRuleVersion
+
+    # Force one rule to appear overdue so we can test the staff-only
+    # warning independently from the real rule review dates.
+    monkeypatch.setattr(
+        ProgramRuleVersion,
+        "review_overdue",
+        lambda self, on_date: self.program_id == "calfresh",
+    )
+
     client = TestClient(create_app(settings))
+
     login = client.get("/staff/login")
+
     import re
 
-    csrf = re.search(r'name="csrf" value="([^"]+)"', login.text).group(1)
+    csrf = re.search(
+        r'name="csrf" value="([^"]+)"',
+        login.text,
+    ).group(1)
+
     auth = client.post(
         "/staff/login",
-        data={"csrf": csrf, "username": settings.staff_username, "password": settings.staff_password},
+        data={
+            "csrf": csrf,
+            "username": settings.staff_username,
+            "password": settings.staff_password,
+        },
         follow_redirects=True,
     )
+
     assert auth.status_code == 200
+
     page = client.get("/staff/rules")
+
     assert page.status_code == 200
+
+    # Internal rule metadata should be visible to staff.
     assert "Review due" in page.text
+
+    # And an overdue rule should receive the private warning indicator.
     assert "review-dot" in page.text
 
 
