@@ -1,0 +1,8 @@
+<nav class="journey-timeline" aria-label="Eligibility progress">
+  {% for number,label in [(1,'Profile'),(2,'Answer'),(3,'Match'),(4,'Connect')] %}
+    <div class="journey-step {% if number < journey_step %}done{% elif number == journey_step %}active{% endif %}">
+      <span class="journey-dot">{{ '✓' if number < journey_step else number }}</span>
+      <small>{{ label }}</small>
+    </div>
+  {% endfor %}
+</nav>

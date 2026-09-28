@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Eligibility question | SANDI{% endblock %}
+{% block content %}
+<section class="narrow-page question-page">
+  {% set journey_step = 2 %}{% include "_journey_timeline.html" %}
+  <div class="progress-card" aria-label="Eligibility progress">
+    <div class="progress-summary">
+      <span><strong>{{ progress.answered }}</strong> useful answer{% if progress.answered != 1 %}s{% endif %} saved</span>
+      <span>{{ progress.remaining }} useful question{% if progress.remaining != 1 %}s{% endif %} left</span>
+    </div>
+    <progress max="100" value="{{ progress.percent }}">{{ progress.percent }}%</progress>
+  </div>
+  {% if answer_saved and not new_matches %}<div class="save-toast" role="status">✓ Saved. One less thing to answer later.</div>{% endif %}
+  {% if new_matches %}
+  <section class="match-alert celebration" role="status">
+    <span class="celebration-icon" aria-hidden="true">★</span>
+    <div><p class="eyebrow">New match unlocked</p>{% for match in new_matches %}<h2>{{ match.program_name }}</h2><p>{{ match.summary }}</p><div class="action-row compact-actions">{% for action in actions_by_program.get(match.program_id, []) %}<a class="button {{ 'primary' if action.kind == 'primary' else 'secondary' }}" href="{{ action.href }}" target="_blank" rel="noopener">{{ action.label }}</a>{% endfor %}<a class="link-button" href="/p/{{ profile.profile_id }}/results">Why this matched</a></div>{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  <div class="question-heading"><p class="eyebrow">One question at a time</p><h1>{{ question.text(profile.language) }}</h1>{% if question.help_text(profile.language) %}<p class="question-help">{{ question.help_text(profile.language) }}</p>{% endif %}</div>
+  {% if error %}<div class="notice danger">{{ error }}</div>{% endif %}
+  <form method="post" action="/p/{{ profile.profile_id }}/questions/{{ question.question_id }}" class="card stack question-card clean-question-card">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}"><input type="hidden" name="answer_state" value="known">{% set saved = profile.answer(question.question_id) %}
+    {% if question.answer_type == 'number' %}<label class="big-field">Your answer{% if question.unit %} <span class="optional">{{ question.unit }}</span>{% endif %}<input type="number" min="0" step="1" name="value" value="{{ saved.value if saved and saved.value is not none else '' }}" inputmode="decimal" required></label>
+    {% elif question.answer_type == 'text' %}<label class="big-field">Your answer<input type="text" name="value" value="{{ saved.value if saved and saved.value is not none else '' }}" placeholder="{{ question.placeholder }}" required></label>
+    {% elif question.answer_type == 'single_select' %}<fieldset><legend class="sr-only">Select one</legend><div class="choice-cards">{% for option in question.options %}<label><input type="radio" name="value" value="{{ option.value }}" {% if saved and saved.value == option.value %}checked{% endif %} required><span>{{ option.label_es if profile.language == 'es' else option.label_en }}</span></label>{% endfor %}</div></fieldset>
+    {% elif question.answer_type == 'multi_select' %}<fieldset><legend class="sr-only">Select all that apply</legend><div class="choice-cards">{% for option in question.options %}<label><input type="checkbox" name="value" value="{{ option.value }}" {% if saved and saved.value and option.value in saved.value %}checked{% endif %}><span>{{ option.label_es if profile.language == 'es' else option.label_en }}</span></label>{% endfor %}</div></fieldset>{% endif %}
+    <button class="button primary big-action" type="submit">Save & next →</button>
+  </form>
+  <div class="quiet-actions"><form method="post" action="/p/{{ profile.profile_id }}/questions/{{ question.question_id }}"><input type="hidden" name="csrf" value="{{ csrf_token }}"><input type="hidden" name="answer_state" value="unknown"><button class="button secondary" type="submit">I don't know</button></form><form method="post" action="/p/{{ profile.profile_id }}/questions/{{ question.question_id }}"><input type="hidden" name="csrf" value="{{ csrf_token }}"><input type="hidden" name="answer_state" value="skipped"><button class="link-button" type="submit">Skip</button></form><a class="link-button" href="/p/{{ profile.profile_id }}/results">Stop & see matches</a></div>
+</section>
+{% endblock %}

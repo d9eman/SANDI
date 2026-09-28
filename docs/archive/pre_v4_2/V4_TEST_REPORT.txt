@@ -1,0 +1,28 @@
+SANDI v4 validation report
+Date: 2026-08-05
+
+Commands:
+  python -m compileall -q app scripts
+  pytest -q
+  python scripts/export_eligibility_matrix.py
+
+Results:
+  22 automated tests passed.
+  Rule/question CSV export completed.
+  Clean-database web route smoke tests passed.
+  Existing v3 profile and saved answer survived additive v4 migration.
+
+Covered behavior:
+- distinct food-now and eligibility-profile start paths
+- ZIP reuse after optional transition from food finder
+- no repeated food-map step during profile creation
+- browser-location UI controls and visible status region
+- local direct-site filtering
+- deterministic rule evaluation
+- conditional question short-circuiting
+- expected-versus-actual failure explanations
+- ranked result grouping and official action links
+- live staff CSV export
+- provider/staff login
+- referral state machine
+- encrypted demo document vault

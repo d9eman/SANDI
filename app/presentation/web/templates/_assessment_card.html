@@ -1,0 +1,70 @@
+{% macro assessment_card(assessment, featured=False) %}
+<article class="result-card-simple {% if featured %}featured-result{% endif %} result-{{ assessment.status.value|lower }}">
+  <div class="result-main">
+    <div class="result-summary">
+      <span class="badge status {{ assessment.status.value|lower }}">{{ status_labels[assessment.status.value] }}</span>
+      <h2>{{ assessment.program_name }}</h2>
+      <p>{{ assessment.summary }}</p>
+    </div>
+
+    {% if actions_by_program.get(assessment.program_id) %}
+      <div class="result-actions" aria-label="Next actions for {{ assessment.program_name }}">
+        {% for action in actions_by_program[assessment.program_id] %}
+          <a class="button {{ 'primary' if action.kind == 'primary' else 'secondary' }}"
+             href="{{ action.href }}" target="_blank" rel="noopener">{{ action.label }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if assessment.status.value == 'RULE_UNDER_REVIEW' %}
+    <div class="screening-update-note">
+      <strong>This is a SANDI maintenance status, not a problem with your answers.</strong>
+      <p>{{ assessment.next_step }}</p>
+    </div>
+    <details class="source-details compact-source-details">
+      <summary>Program source</summary>
+      <p>{{ assessment.source_label }}</p>
+      {% if assessment.source_url %}<p><a href="{{ assessment.source_url }}" target="_blank" rel="noopener">Open official source</a></p>{% endif %}
+    </details>
+  {% else %}
+    {% if assessment.missing_fields %}
+      <div class="missing-answers">
+        <strong>To make this clearer:</strong>
+        {% for field in assessment.missing_fields %}
+          {% if field in questions %}
+            <a class="answer-chip" href="/p/{{ profile.profile_id }}/questions?question={{ field }}">{{ questions[field].text(profile.language) }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <details class="why-details">
+      <summary>Why did I get this result?</summary>
+      <div class="requirement-list">
+        {% for requirement in assessment.requirements %}
+          <div class="requirement-row requirement-{{ requirement.state.value|lower }}">
+            <div class="requirement-heading">
+              <span class="requirement-state">
+                {% if requirement.state.value == 'PASS' %}✓ Met{% elif requirement.state.value == 'FAIL' %}Not met{% else %}Need answer{% endif %}
+              </span>
+              <strong>{{ requirement.requirement }}</strong>
+            </div>
+            <dl class="comparison-grid">
+              <div><dt>Program expects</dt><dd>{{ requirement.expected or 'See current rule' }}</dd></div>
+              <div><dt>Your answer</dt><dd>{{ requirement.actual or 'Not answered' }}</dd></div>
+            </dl>
+            {% if requirement.reason %}<p class="field-note">{{ requirement.reason }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <p><strong>Next step:</strong> {{ assessment.next_step }}</p>
+      <details class="source-details">
+        <summary>Official rule source</summary>
+        <p>{{ assessment.source_label }}</p>
+        {% if assessment.source_url %}<p><a href="{{ assessment.source_url }}" target="_blank" rel="noopener">Open source</a></p>{% endif %}
+      </details>
+    </details>
+  {% endif %}
+</article>
+{% endmacro %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Rule versions | SANDI Demo{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Internal rule trace</p>
+    <h1>Program rule versions</h1>
+    <p>Effective dates control whether a rule can be used. Review dates are internal reminders only and never change a user's eligibility result.</p>
+  </div>
+  <div class="action-row">
+    <a class="button primary" href="/staff/eligibility-matrix.csv">Download requirements &amp; questions CSV</a>
+    <a class="button secondary" href="/staff">Back</a>
+  </div>
+</section>
+<div class="result-list">
+{% for item in summaries %}
+<article class="card">
+  <div class="card-topline">
+    <span class="badge">{{ item.rule.rule_version_id }}</span>
+    <span class="internal-rule-status">
+      <span class="rule-effective-state {{ item.effective_state }}">{{ item.effective_state|capitalize }}</span>
+      {% if item.review_overdue %}
+        <span class="review-dot" title="Needs internal review. Review due {{ item.rule.review_due }}" aria-label="Needs internal review"></span>
+      {% endif %}
+    </span>
+  </div>
+  <h2>{{ item.rule.program_name }}</h2>
+  <p>{{ item.rule.program_description }}</p>
+  <dl class="rule-metadata-grid">
+    <div><dt>Effective from</dt><dd>{{ item.rule.effective_from }}</dd></div>
+    <div><dt>Effective through</dt><dd>{{ item.rule.effective_to or 'No end date' }}</dd></div>
+    <div><dt>Review due</dt><dd>{{ item.rule.review_due or 'Not set' }}{% if item.review_overdue %} <strong class="needs-review-text">Needs review</strong>{% endif %}</dd></div>
+    <div><dt>Source</dt><dd>{{ item.rule.source_label }}</dd></div>
+  </dl>
+  <p><strong>Display priority:</strong> {{ item.rule.display_priority }} · <strong>Access score:</strong> {{ item.rule.access_score }}</p>
+  <p><strong>Fields:</strong> {{ item.fields|join(', ') if item.fields else 'none' }}</p>
+  <p class="field-note">{{ item.rule.notice }}</p>
+</article>
+{% endfor %}
+</div>
+{% endblock %}

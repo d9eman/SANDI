@@ -1,0 +1,96 @@
+{
+  "program": {
+    "id": "restaurant_meals",
+    "name": "Restaurant Meals Program route",
+    "description": "Checks whether a current CalFresh household may fit a qualifying RMP category.",
+    "display_priority": 30,
+    "access_score": 75,
+    "actions": [
+      {
+        "service_id": "svc_rmp_info",
+        "label": "Check Restaurant Meals options",
+        "kind": "primary"
+      }
+    ]
+  },
+  "versions": [
+    {
+      "id": "rmp-route-v2",
+      "effective_from": "2026-01-01",
+      "effective_to": "2026-12-31",
+      "review_due": "2026-11-01",
+      "source_label": "California Department of Social Services Restaurant Meals Program",
+      "source_url": "https://www.cdss.ca.gov/rmp",
+      "notice": "Routing feature only. It does not approve CalFresh or guarantee that a restaurant participates.",
+      "pass_status": "MAY_QUALIFY",
+      "unknown_status": "NEEDS_INFORMATION",
+      "fail_status": "LIKELY_NOT_ELIGIBLE",
+      "expression": {
+        "type": "all",
+        "conditions": [
+          {
+            "type": "predicate",
+            "field": "current_calfresh",
+            "operator": "equals",
+            "value": "yes",
+            "pass_reason": "Current CalFresh participation was reported.",
+            "fail_reason": "This route generally requires current CalFresh participation.",
+            "unknown_reason": "Current CalFresh participation is needed for this route.",
+            "requirement": "Current CalFresh participation"
+          },
+          {
+            "type": "any",
+            "conditions": [
+              {
+                "type": "predicate",
+                "field": "age_60_plus",
+                "operator": "equals",
+                "value": true,
+                "pass_reason": "Age 60 or older may fit an RMP category.",
+                "fail_reason": "Age 60+ was not indicated.",
+                "unknown_reason": "Age could change this route.",
+                "requirement": "Age-based Restaurant Meals category",
+                "expected_text": "Age 60 or older"
+              },
+              {
+                "type": "predicate",
+                "field": "disability",
+                "operator": "equals",
+                "value": "yes",
+                "pass_reason": "A disability-related category may fit the route.",
+                "fail_reason": "A disability category was not reported.",
+                "unknown_reason": "Disability information could change this route.",
+                "requirement": "Disability-related Restaurant Meals category"
+              },
+              {
+                "type": "predicate",
+                "field": "no_fixed_address",
+                "operator": "equals",
+                "value": true,
+                "pass_reason": "The reported housing situation may fit the homelessness category.",
+                "fail_reason": "A qualifying housing situation was not indicated.",
+                "unknown_reason": "Housing status could change this route.",
+                "requirement": "Housing-status Restaurant Meals category",
+                "expected_text": "Temporary, sheltered, unsheltered, or no fixed address"
+              }
+            ]
+          }
+        ]
+      },
+      "next_steps": {
+        "MAY_QUALIFY": "Check the current RMP participant route and participating restaurant list.",
+        "NEEDS_INFORMATION": "Answer only the missing questions you are comfortable with or ask a benefits worker.",
+        "LIKELY_NOT_ELIGIBLE": "Use direct food resources and ordinary CalFresh retailer options.",
+        "RULE_UNDER_REVIEW": "Use the current CDSS RMP source."
+      },
+      "result_summaries": {
+        "DIRECT_RESOURCE": "Available to everyone without completing the eligibility survey.",
+        "LIKELY_ELIGIBLE": "Your current answers meet every rule included in this pre-screen. The official agency still decides.",
+        "MAY_QUALIFY": "Your current answers make this a useful next step, but the provider or agency must confirm remaining requirements.",
+        "NEEDS_INFORMATION": "A small number of unanswered items could change this result.",
+        "LIKELY_NOT_ELIGIBLE": "At least one current answer does not meet this pre-screen. Open the details to compare what was expected with what you entered.",
+        "RULE_UNDER_REVIEW": "SANDI will not rely on this rule until its owner reviews the current version."
+      }
+    }
+  ]
+}

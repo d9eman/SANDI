@@ -1,0 +1,16 @@
+<details class="feedback-panel">
+  <summary>Tell us whether this helped</summary>
+  <form method="post" action="/resource-feedback" class="stack compact-form">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <input type="hidden" name="service_id" value="{{ item.service_id }}">
+    <input type="hidden" name="location" value="{{ location }}">
+    <fieldset>
+      <legend class="sr-only">Did this resource help?</legend>
+      <label class="choice"><input type="radio" name="outcome" value="yes" required> Yes, I found a useful option</label>
+      <label class="choice"><input type="radio" name="outcome" value="not_yet"> Not yet</label>
+      <label class="choice"><input type="radio" name="outcome" value="no"> No, the information did not work</label>
+    </fieldset>
+    <label>Optional note<textarea name="note" rows="2" maxlength="500" placeholder="Example: site was closed or too far away"></textarea></label>
+    <button class="button secondary" type="submit">Save feedback</button>
+  </form>
+</details>

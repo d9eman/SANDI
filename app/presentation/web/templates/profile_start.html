@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Start eligibility check | SANDI{% endblock %}
+{% block content %}
+<section class="narrow-page clean-page">
+  {% set journey_step = 1 %}{% include "_journey_timeline.html" %}
+  <p class="eyebrow">Step 1 · Make a reusable profile</p>
+  <h1>Answer once. Check many programs.</h1>
+  <p class="lede">No name, phone, email, or ID is required. You can stop and return at any time.</p>
+  {% if notice == "profile_not_found" %}<div class="notice warning"><strong>That saved demo profile is not in this copy.</strong> Start a new one below or return with another profile ID.</div>{% endif %}
+  {% if prefill_zip %}<div class="tiny-success">✓ ZIP {{ prefill_zip }} is already saved from the food finder.</div>{% endif %}
+  <form method="post" action="/start" class="card stack clean-form-card">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}"><input type="hidden" name="need" value="food"><input type="hidden" name="source" value="{{ source }}"><input type="hidden" name="danger" value="no">
+    <fieldset><legend>Choose your language</legend><div class="choice-cards two-choice-cards"><label><input type="radio" name="language" value="en" checked><span>English</span></label><label><input type="radio" name="language" value="es"><span>Español</span></label></div></fieldset>
+    <button class="button primary big-action" type="submit">Start my eligibility check</button>
+  </form>
+  <details class="quiet-details"><summary>Need emergency help instead?</summary><p>If anyone is in immediate danger or having a medical emergency, call 911. You can return to SANDI afterward.</p></details>
+  <p class="field-note">SANDI provides pre-screening and routing. The agency or provider makes the official decision.</p>
+</section>
+{% endblock %}

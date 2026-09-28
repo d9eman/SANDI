@@ -1,0 +1,20 @@
+services:
+  sandi-demo:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SANDI_DATA_DIR: /app/data
+      SANDI_SESSION_SECRET: ${SANDI_SESSION_SECRET:-local-docker-demo-secret-change-me}
+      SANDI_VAULT_KEY: ${SANDI_VAULT_KEY:-}
+      SANDI_STAFF_USERNAME: ${SANDI_STAFF_USERNAME:-staff}
+      SANDI_STAFF_PASSWORD: ${SANDI_STAFF_PASSWORD:-sandi-demo}
+      SANDI_PROVIDER_USERNAME: ${SANDI_PROVIDER_USERNAME:-provider}
+      SANDI_PROVIDER_PASSWORD: ${SANDI_PROVIDER_PASSWORD:-sandi-demo}
+      SANDI_DEMO_MODE: "true"
+    volumes:
+      - sandi_demo_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  sandi_demo_data:

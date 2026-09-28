@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Profile created | SANDI{% endblock %}
+{% block content %}
+<section class="narrow-page clean-page">
+  {% set journey_step = 1 %}{% include "_journey_timeline.html" %}
+  <div class="success-mark" aria-hidden="true">✓</div>
+  <p class="eyebrow">Profile ready</p><h1>Nice — your place is saved.</h1>
+  <p>Keep these recovery details somewhere safe. The recovery phrase is shown only once.</p>
+  <div class="recovery-box compact-recovery"><div><span>Profile ID</span><strong id="profile-id">{{ profile_id }}</strong></div><div><span>Recovery phrase</span><strong id="recovery-phrase">{{ recovery_phrase }}</strong></div></div>
+  <div class="action-row"><button class="button secondary" type="button" data-copy-target="recovery-phrase">Copy phrase</button><a class="button primary" href="/p/{{ profile_id }}/questions">Answer my first question →</a></div>
+  {% if profile.value('zip_code') %}<p class="tiny-success">✓ ZIP {{ profile.value('zip_code') }} was reused, so you will not be asked again.</p>{% endif %}
+</section>
+{% endblock %}

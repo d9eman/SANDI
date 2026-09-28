@@ -1,0 +1,17 @@
+SANDI Food and Eligibility Demo v4.1
+Built: 2026-08-06
+
+Hotfixes:
+- stale browser profile cookies are validated and cleared before use
+- anonymous food search no longer fails on a deleted optional profile reference
+- stale profile bookmarks redirect to a clear restart page instead of HTTP 500
+- homepage says Start eligibility check before profile creation
+- homepage says Continue my eligibility check only for a valid existing profile
+- removed See my matches from the homepage
+- Windows launcher falls back to the active python command when py is unavailable
+
+Validation:
+- 25 automated tests passed
+- stale-session food route regression passed
+- stale profile question-route redirect regression passed
+- optional foreign-key interaction regression passed

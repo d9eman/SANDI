@@ -1,0 +1,22 @@
+SANDI v4.1 validation
+=====================
+
+Automated tests: 25 passed
+
+New regression coverage:
+- a stale profile cookie cannot crash /food-now
+- a stale profile cookie is cleared from rendered navigation
+- an old /p/{profile_id}/questions bookmark redirects to profile restart
+- optional analytics foreign keys are removed when no longer valid
+- homepage shows Start before profile creation and Continue afterward
+- homepage does not show See my matches
+
+Existing v4 coverage remains in place for:
+- food map/direct-site separation
+- browser location controls
+- profile-to-question routing
+- ZIP reuse
+- ranked eligibility explanations
+- resource open/feedback tracking
+- staff/provider login
+- rule matrix export

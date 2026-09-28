@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Optional documents | SANDI{% endblock %}
+{% block content %}
+<section class="narrow-page clean-page">
+  <p class="eyebrow">Optional document vault</p><h1>Keep documents ready for later.</h1><p>Uploading is optional and never required to browse resources or run the pre-screen.</p>
+  <div class="notice warning"><strong>Prototype:</strong> use test files only. Production use still requires security, privacy, malware-scanning, and legal review.</div>
+  {% if error %}<div class="notice danger">{{ error }}</div>{% endif %}
+  <form method="post" enctype="multipart/form-data" action="/p/{{ profile_id }}/documents" class="card stack clean-form-card"><input type="hidden" name="csrf" value="{{ csrf_token }}"><label>What is this?<select name="document_type"><option value="identity">ID / identity document</option><option value="benefit_letter">Benefits or SSI letter</option><option value="income">Income document</option><option value="veteran">Veteran document</option><option value="foster_care">Foster-care document</option><option value="residency">Residency document</option><option value="other">Other photo or document</option></select></label><input type="hidden" name="purpose" value="User-controlled demo storage"><label>Choose a PDF or photo<input type="file" name="file" accept="application/pdf,image/png,image/jpeg" required></label><button class="button primary" type="submit">Store securely</button></form>
+  <details class="card" {% if documents %}open{% endif %}><summary>Stored documents ({{ documents|length }})</summary>{% for doc in documents %}<article class="document-row"><div><strong>{{ doc.document_type.replace('_',' ')|title }}</strong><span>{{ doc.original_name }}</span></div><div class="action-row"><a href="/p/{{ profile_id }}/documents/{{ doc.id }}/download?token={{ doc.download_token }}">Download</a><form method="post" action="/p/{{ profile_id }}/documents/{{ doc.id }}/delete"><input type="hidden" name="csrf" value="{{ csrf_token }}"><button class="link-button danger-text" type="submit">Delete</button></form></div></article>{% else %}<p>No documents stored.</p>{% endfor %}</details>
+  <p class="field-note">Providers do not automatically see these files. A future direct-referral integration must request separate, purpose-specific consent before sharing any document.</p>
+</section>
+{% endblock %}

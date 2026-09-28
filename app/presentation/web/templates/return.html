@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Return to profile | SANDI Demo{% endblock %}
+{% block content %}
+<section class="narrow">
+  <p class="eyebrow">Resume without an account</p>
+  <h1>Open a saved guest profile.</h1>
+  {% if error %}<div class="notice danger">{{ error }}</div>{% endif %}
+  <form method="post" action="/return" class="card stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Profile ID <input name="profile_id" autocomplete="off" placeholder="SAN-1234ABCD" required></label>
+    <label>Recovery phrase <input name="recovery_phrase" autocomplete="off" placeholder="four-word-phrase" required></label>
+    <button class="button primary" type="submit">Open profile</button>
+  </form>
+</section>
+{% endblock %}

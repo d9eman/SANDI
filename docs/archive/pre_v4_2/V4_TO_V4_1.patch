@@ -1,0 +1,479 @@
+diff --git a/BUILD_INFO.txt b/BUILD_INFO.txt
+index aa1df12..65e6a92 100644
+--- a/BUILD_INFO.txt
++++ b/BUILD_INFO.txt
+@@ -1,23 +1,17 @@
+-SANDI Food and Eligibility Demo v4
+-Built: 2026-08-05
++SANDI Food and Eligibility Demo v4.1
++Built: 2026-08-06
+ 
+-Key changes:
+-- fixed browser-location control with visible status and fallback
+-- separate immediate-food and eligibility-profile entry paths
+-- reuse ZIP/urgency only when the user moves from food search into profile creation
+-- location-aware direct-site filtering; countywide maps remain separate
+-- progressive one-question survey with conditional short-circuiting
+-- immediate in-survey alert when a program becomes actionable
+-- green/yellow/red ranked results with non-matches collapsed
+-- expected-versus-actual requirement explanations
+-- official action links resolved through the provider/service catalog
+-- live and command-line eligibility requirements/question CSV export
+-- additive v3-to-v4 assessment migration
++Hotfixes:
++- stale browser profile cookies are validated and cleared before use
++- anonymous food search no longer fails on a deleted optional profile reference
++- stale profile bookmarks redirect to a clear restart page instead of HTTP 500
++- homepage says Start eligibility check before profile creation
++- homepage says Continue my eligibility check only for a valid existing profile
++- removed See my matches from the homepage
++- Windows launcher falls back to the active python command when py is unavailable
+ 
+ Validation:
+-- Python compilation successful
+-- 22 automated tests passed
+-- clean database startup passed
+-- v3 profile/answer database migration passed
+-- 92101 location test excludes the Vista direct pantry
+-- 92081 location test includes the Vista direct pantry
++- 25 automated tests passed
++- stale-session food route regression passed
++- stale profile question-route redirect regression passed
++- optional foreign-key interaction regression passed
+diff --git a/FILE_MANIFEST.txt b/FILE_MANIFEST.txt
+index 66f060a..b339e33 100644
+--- a/FILE_MANIFEST.txt
++++ b/FILE_MANIFEST.txt
+@@ -1,5 +1,5 @@
+-SANDI Food and Eligibility Demo v4
+-Separate immediate-food navigation, progressive eligibility profile, explainable ranked matches, and tracked handoffs.
++SANDI Food and Eligibility Demo v4.1
++Stale-session recovery and corrected Start/Continue eligibility flow.
+ 
+ .env.example
+ .gitignore
+@@ -25,9 +25,11 @@ UPGRADING_TO_V4.md
+ V2_TO_V3.patch
+ V3_CODE_AND_FLOW_GUIDE.md
+ V3_TO_V4.patch
++V4_1_HOTFIX.md
+ V4_CHANGELOG.md
+ V4_CODE_AND_FLOW_GUIDE.md
+ V4_TEST_REPORT.txt
++V4_TO_V4_1.patch
+ app/__init__.py
+ app/adapters/__init__.py
+ app/adapters/notifications/__init__.py
+diff --git a/README.md b/README.md
+index 30b8122..f930e61 100644
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,8 @@
+-# SANDI Food and Eligibility Demo v4
++# Version 4.1 hotfix
++
++This package includes stale-session recovery and corrected Start/Continue eligibility behavior. See `V4_1_HOTFIX.md`.
++
++# SANDI Food and Eligibility Demo v4.1
+ 
+ Version 4 separates two user goals that must not be forced into one path:
+ 
+diff --git a/V4_1_HOTFIX.md b/V4_1_HOTFIX.md
+new file mode 100644
+index 0000000..b0f50a0
+--- /dev/null
++++ b/V4_1_HOTFIX.md
+@@ -0,0 +1,32 @@
++# SANDI v4.1 hotfix
++
++## Failures fixed
++
++### `/food-now` returned HTTP 500
++
++A browser cookie still contained a profile ID from an older local database. The food finder attached that optional profile ID to a `resource_interactions` row. SQLite correctly rejected it because the profile no longer existed.
++
++Version 4.1 validates the profile cookie before use, clears stale profile state, and defensively removes invalid optional analytics references instead of interrupting food access.
++
++### Eligibility routes returned HTTP 500
++
++The URL and cookie referenced a deleted profile. `ProfileService.require()` raised `KeyError`. Version 4.1 redirects stale bookmarks to `/profile/start?notice=profile_not_found` and explains what happened.
++
++## Homepage behavior
++
++- No active profile: **Start eligibility check**
++- Existing valid profile: **Continue my eligibility check**
++- The homepage no longer shows **See my matches**.
++
++## Files changed
++
++- `app/security/web.py`
++- `app/presentation/web/helpers.py`
++- `app/presentation/web/public_routes.py`
++- `app/adapters/sqlite/repositories.py`
++- `app/presentation/web/templates/index.html`
++- `app/presentation/web/templates/profile_start.html`
++- `app/presentation/web/templates/base.html`
++- `app/main.py`
++- `run_demo.bat`
++- `tests/test_web_smoke.py`
+diff --git a/V4_1_TEST_REPORT.txt b/V4_1_TEST_REPORT.txt
+new file mode 100644
+index 0000000..7b4326a
+--- /dev/null
++++ b/V4_1_TEST_REPORT.txt
+@@ -0,0 +1,22 @@
++SANDI v4.1 validation
++=====================
++
++Automated tests: 25 passed
++
++New regression coverage:
++- a stale profile cookie cannot crash /food-now
++- a stale profile cookie is cleared from rendered navigation
++- an old /p/{profile_id}/questions bookmark redirects to profile restart
++- optional analytics foreign keys are removed when no longer valid
++- homepage shows Start before profile creation and Continue afterward
++- homepage does not show See my matches
++
++Existing v4 coverage remains in place for:
++- food map/direct-site separation
++- browser location controls
++- profile-to-question routing
++- ZIP reuse
++- ranked eligibility explanations
++- resource open/feedback tracking
++- staff/provider login
++- rule matrix export
+diff --git a/app/adapters/sqlite/repositories.py b/app/adapters/sqlite/repositories.py
+index 76c4332..e4c3ddf 100644
+--- a/app/adapters/sqlite/repositories.py
++++ b/app/adapters/sqlite/repositories.py
+@@ -551,6 +551,22 @@ class SqliteResourceRepository(ResourceRepository):
+         metadata: dict[str, Any] | None = None,
+     ) -> None:
+         with self.database.transaction() as connection:
++            # Local demo cookies and catalog records can outlive a reset database.
++            # Interaction analytics must never take down the user-facing resource
++            # finder because an optional foreign-key reference became stale.
++            stored_profile_id = profile_id
++            stored_service_id = service_id
++            payload = dict(metadata or {})
++            if stored_profile_id and connection.execute(
++                "SELECT 1 FROM profiles WHERE id=?", (stored_profile_id,)
++            ).fetchone() is None:
++                stored_profile_id = None
++                payload["stale_profile_reference_removed"] = True
++            if stored_service_id and connection.execute(
++                "SELECT 1 FROM services WHERE id=?", (stored_service_id,)
++            ).fetchone() is None:
++                stored_service_id = None
++                payload["stale_service_reference_removed"] = True
+             connection.execute(
+                 """
+                 INSERT INTO resource_interactions(
+@@ -561,12 +577,12 @@ class SqliteResourceRepository(ResourceRepository):
+                 """,
+                 (
+                     visitor_id,
+-                    profile_id,
+-                    service_id,
++                    stored_profile_id,
++                    stored_service_id,
+                     action,
+                     location_text,
+                     outcome,
+-                    json.dumps(metadata or {}),
++                    json.dumps(payload),
+                     utcnow(),
+                 ),
+             )
+diff --git a/app/main.py b/app/main.py
+index 4d131ff..fb110d4 100644
+--- a/app/main.py
++++ b/app/main.py
+@@ -19,7 +19,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
+     app = FastAPI(
+         title="SANDI Food and Eligibility Demo",
+         description="Separate immediate-food navigation and low-barrier, explainable multi-program eligibility screening.",
+-        version="0.4.0",
++        version="0.4.1",
+     )
+     app.state.container = container
+     app.add_middleware(
+diff --git a/app/presentation/web/helpers.py b/app/presentation/web/helpers.py
+index 66a6ade..1a1fa78 100644
+--- a/app/presentation/web/helpers.py
++++ b/app/presentation/web/helpers.py
+@@ -5,7 +5,7 @@ from typing import Any
+ from fastapi import Request
+ from fastapi.templating import Jinja2Templates
+ 
+-from app.security.web import csrf_token
++from app.security.web import active_profile_id, csrf_token
+ 
+ 
+ STATUS_LABELS = {
+@@ -23,7 +23,7 @@ def render(templates: Jinja2Templates, request: Request, name: str, context: dic
+         "request": request,
+         "csrf_token": csrf_token(request),
+         "demo_mode": request.app.state.container.settings.demo_mode,
+-        "current_profile_id": request.session.get("profile_id"),
++        "current_profile_id": active_profile_id(request),
+         "provider_logged_in": bool(request.session.get("provider_actor")),
+         "staff_logged_in": bool(request.session.get("staff_actor")),
+         "status_labels": STATUS_LABELS,
+diff --git a/app/presentation/web/public_routes.py b/app/presentation/web/public_routes.py
+index 91b8819..c7f30ae 100644
+--- a/app/presentation/web/public_routes.py
++++ b/app/presentation/web/public_routes.py
+@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
+ 
+ from app.application.document_service import DocumentValidationError
+ from app.domain.enums import AnswerState, EligibilityStatus, ReferralState
+-from app.security.web import authorize_profile, verify_csrf
++from app.security.web import active_profile_id, authorize_profile, verify_csrf
+ from .helpers import render
+ 
+ 
+@@ -128,7 +128,7 @@ def food_now(
+     request.session["last_food_urgency"] = urgency if urgency in {"now", "today", "next_days"} else "today"
+     request.session["last_food_had_coordinates"] = lat is not None and lon is not None
+ 
+-    profile_id = request.session.get("profile_id")
++    profile_id = active_profile_id(request)
+     matches = app.resources.find_food(
+         actor_id=visitor_id(request),
+         zip_code=clean_location or None,
+@@ -164,7 +164,7 @@ def food_now(
+ @router.get("/go/{service_id}")
+ def open_public_resource(request: Request, service_id: str, location: str = ""):
+     """Record a public handoff, then redirect to the provider-owned resource."""
+-    profile_id = request.session.get("profile_id")
++    profile_id = active_profile_id(request)
+     try:
+         target = container(request).resources.record_open(
+             visitor_id=visitor_id(request),
+@@ -189,7 +189,7 @@ def resource_feedback(
+     note: str = Form(""),
+ ):
+     verify_csrf(request, csrf)
+-    profile_id = request.session.get("profile_id")
++    profile_id = active_profile_id(request)
+     app = container(request)
+     try:
+         app.resources.record_feedback(
+@@ -210,7 +210,7 @@ def resource_feedback(
+ 
+ 
+ @router.get("/profile/start")
+-def profile_start(request: Request, source: str = "direct"):
++def profile_start(request: Request, source: str = "direct", notice: str = ""):
+     return render(
+         templates,
+         request,
+@@ -218,6 +218,7 @@ def profile_start(request: Request, source: str = "direct"):
+         {
+             "source": source,
+             "prefill_zip": request.session.get("last_food_zip", "") if source == "food" else "",
++            "notice": notice,
+         },
+     )
+ 
+diff --git a/app/presentation/web/templates/base.html b/app/presentation/web/templates/base.html
+index 8aadfa7..d957e4e 100644
+--- a/app/presentation/web/templates/base.html
++++ b/app/presentation/web/templates/base.html
+@@ -13,7 +13,7 @@
+ <a class="skip-link" href="#main">Skip to main content</a>
+ <header class="site-header">
+   <div class="shell nav-row">
+-    <a class="brand" href="/">SANDI <span>Food & Eligibility Demo v4</span></a>
++    <a class="brand" href="/">SANDI <span>Food & Eligibility Demo v4.1</span></a>
+     <nav aria-label="Main navigation">
+       <a href="/food-now">Find food now</a>
+       {% if current_profile_id %}
+diff --git a/app/presentation/web/templates/index.html b/app/presentation/web/templates/index.html
+index c0b0af5..098a31e 100644
+--- a/app/presentation/web/templates/index.html
++++ b/app/presentation/web/templates/index.html
+@@ -21,9 +21,8 @@
+     <p>Answer only what you know. SANDI compares the same answers across every active program and ranks your strongest matches first.</p>
+     {% if current_profile_id %}
+       <a class="button primary" href="/p/{{ current_profile_id }}/questions">Continue my eligibility check</a>
+-      <a class="button secondary" href="/p/{{ current_profile_id }}/results">See my matches</a>
+     {% else %}
+-      <a class="button primary" href="/profile/start">Create an eligibility profile</a>
++      <a class="button primary" href="/profile/start">Start eligibility check</a>
+       <a class="button secondary" href="/return">Return to a saved profile</a>
+     {% endif %}
+   </article>
+diff --git a/app/presentation/web/templates/profile_start.html b/app/presentation/web/templates/profile_start.html
+index 9d6bfbb..9b6351b 100644
+--- a/app/presentation/web/templates/profile_start.html
++++ b/app/presentation/web/templates/profile_start.html
+@@ -5,6 +5,7 @@
+   <p class="eyebrow">Optional reusable profile</p>
+   <h1>Check several programs without repeating the same questions.</h1>
+   <p class="lede">You do not need to provide a name, phone number, email, or ID. You can stop at any time and keep your place.</p>
++  {% if notice == "profile_not_found" %}<div class="notice warning"><strong>Your previous local profile was not found.</strong> The browser remembered an older demo session, but that profile is not in this copy of the database. Start a new check below or return using a profile ID that exists in this installation.</div>{% endif %}
+   {% if prefill_zip %}<div class="notice success"><strong>We will reuse ZIP {{ prefill_zip }}.</strong> You entered it in the food finder, so SANDI will not ask again unless you choose to edit it.</div>{% endif %}
+   <form method="post" action="/start" class="card stack">
+     <input type="hidden" name="csrf" value="{{ csrf_token }}">
+diff --git a/app/security/web.py b/app/security/web.py
+index ee33c42..b8b4a84 100644
+--- a/app/security/web.py
++++ b/app/security/web.py
+@@ -24,8 +24,47 @@ def verify_csrf(request: Request, submitted: str) -> None:
+         raise CsrfError()
+ 
+ 
++def clear_profile_session(request: Request) -> None:
++    """Remove only user-profile state while preserving anonymous and staff/provider sessions."""
++    for key in (
++        "profile_id",
++        "recovery_phrase_once",
++        "new_match_programs",
++        "return_after_emergency",
++    ):
++        request.session.pop(key, None)
++
++
++def active_profile_id(request: Request) -> str | None:
++    """Return the current profile only when it still exists in the active database.
++
++    Browser session cookies can outlive a local demo database.  Without this
++    check, a cookie from an earlier installation can point to a profile that no
++    longer exists and cause foreign-key or KeyError failures.
++    """
++    raw = request.session.get("profile_id")
++    if not raw:
++        return None
++    profile_id = str(raw).strip().upper()
++    repository = request.app.state.container.profile_repository
++    if repository.get(profile_id) is None:
++        clear_profile_session(request)
++        return None
++    if raw != profile_id:
++        request.session["profile_id"] = profile_id
++    return profile_id
++
++
+ def authorize_profile(request: Request, profile_id: str) -> None:
+-    if request.session.get("profile_id") != profile_id:
++    requested = profile_id.strip().upper()
++    current = active_profile_id(request)
++    if current is None:
++        raise HTTPException(
++            status_code=status.HTTP_303_SEE_OTHER,
++            detail="That saved profile is not available in this installation.",
++            headers={"Location": "/profile/start?notice=profile_not_found"},
++        )
++    if current != requested:
+         raise HTTPException(status_code=403, detail="Open this profile with its recovery phrase first.")
+ 
+ 
+diff --git a/run_demo.bat b/run_demo.bat
+index 6655ad0..1ed9925 100755
+--- a/run_demo.bat
++++ b/run_demo.bat
+@@ -1,11 +1,30 @@
+ @echo off
+ setlocal
+-cd /d %~dp0
+-if not exist .venv (
+-  py -m venv .venv
++cd /d "%~dp0"
++
++set "PYTHON_CMD=python"
++where py >nul 2>&1
++if %ERRORLEVEL% EQU 0 set "PYTHON_CMD=py"
++
++if not exist ".venv\Scripts\python.exe" (
++  echo Creating local virtual environment...
++  %PYTHON_CMD% -m venv .venv
++  if errorlevel 1 goto global_python
+ )
+-call .venv\Scripts\activate.bat
++
++call ".venv\Scripts\activate.bat"
++if errorlevel 1 goto global_python
+ python -m pip install --upgrade pip
+ python -m pip install -r requirements.txt
+ python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
++goto end
++
++:global_python
++echo.
++echo Could not create or activate .venv. Using the active Python installation instead.
++python -m pip install --upgrade pip
++python -m pip install -r requirements.txt
++python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
++
++:end
+ endlocal
+diff --git a/tests/test_web_smoke.py b/tests/test_web_smoke.py
+index 39b35d1..4b220c7 100644
+--- a/tests/test_web_smoke.py
++++ b/tests/test_web_smoke.py
+@@ -45,7 +45,8 @@ def test_home_has_two_separate_start_paths(settings):
+     response = client.get("/")
+     assert response.status_code == 200
+     assert "Find food now" in response.text
+-    assert "Create an eligibility profile" in response.text
++    assert "Start eligibility check" in response.text
++    assert "See my matches" not in response.text
+     assert 'action="/start"' not in response.text
+ 
+ 
+@@ -166,3 +167,51 @@ def test_staff_and_provider_form_login(settings):
+     assert login(client2, "/provider/login", "provider", "test-password").status_code == 303
+     assert client2.get("/provider").status_code == 200
+     assert "User journey stage" in client2.get("/provider/new").text
++
++
++def test_home_changes_start_to_continue_only_after_profile_exists(settings):
++    client = TestClient(create_app(settings))
++    first = client.get("/")
++    assert "Start eligibility check" in first.text
++    assert "Continue my eligibility check" not in first.text
++    profile_id = create_profile(client)
++    home = client.get("/")
++    assert "Continue my eligibility check" in home.text
++    assert f'/p/{profile_id}/questions' in home.text
++    assert "See my matches" not in home.text
++
++
++def test_stale_profile_cookie_is_cleared_without_internal_server_error(settings):
++    app = create_app(settings)
++    client = TestClient(app)
++    profile_id = create_profile(client)
++    with app.state.container.database.transaction() as connection:
++        connection.execute("DELETE FROM profiles WHERE id=?", (profile_id,))
++
++    food = client.get("/food-now")
++    assert food.status_code == 200
++    home = client.get("/")
++    assert "Start eligibility check" in home.text
++    assert "Continue my eligibility check" not in home.text
++
++    old_bookmark = client.get(f"/p/{profile_id}/questions", follow_redirects=False)
++    assert old_bookmark.status_code == 303
++    assert old_bookmark.headers["location"] == "/profile/start?notice=profile_not_found"
++
++
++def test_interaction_repository_drops_missing_optional_foreign_keys(settings):
++    app = create_app(settings)
++    app.state.container.resource_repository.record_interaction(
++        visitor_id="VIS-TEST",
++        profile_id="SAN-NOTFOUND",
++        service_id=None,
++        action="search",
++        metadata={"test": True},
++    )
++    with app.state.container.database.connect() as connection:
++        row = connection.execute(
++            "SELECT profile_id, metadata_json FROM resource_interactions WHERE visitor_id=?",
++            ("VIS-TEST",),
++        ).fetchone()
++    assert row["profile_id"] is None
++    assert "stale_profile_reference_removed" in row["metadata_json"]

@@ -1,0 +1,85 @@
+{
+  "program": {
+    "id": "wic",
+    "name": "WIC family-category route",
+    "description": "Routes pregnant/recently pregnant people and households with a child under five to local WIC screening.",
+    "display_priority": 20,
+    "access_score": 90,
+    "actions": [
+      {
+        "service_id": "svc_ca_wic_apply",
+        "label": "Apply for WIC or find a local office",
+        "kind": "primary"
+      }
+    ]
+  },
+  "versions": [
+    {
+      "id": "wic-route-v2",
+      "effective_from": "2026-01-01",
+      "effective_to": "2026-12-31",
+      "review_due": "2026-11-01",
+      "source_label": "California WIC public eligibility and local application route",
+      "source_url": "https://www.cdph.ca.gov/Programs/CFH/DWICSN/Pages/HowCanIGetWIC.aspx",
+      "notice": "Routing pre-screen only. WIC staff review categorical, residency, nutrition-risk, and income requirements.",
+      "pass_status": "MAY_QUALIFY",
+      "unknown_status": "NEEDS_INFORMATION",
+      "fail_status": "LIKELY_NOT_ELIGIBLE",
+      "expression": {
+        "type": "all",
+        "conditions": [
+          {
+            "type": "predicate",
+            "field": "county_residence",
+            "operator": "equals",
+            "value": "San Diego",
+            "pass_reason": "The entered ZIP appears to be in San Diego County.",
+            "fail_reason": "This pilot only shows San Diego routes.",
+            "unknown_reason": "A ZIP is needed for local WIC routing.",
+            "requirement": "San Diego County route",
+            "expected_text": "A ZIP routed to San Diego County"
+          },
+          {
+            "type": "any",
+            "conditions": [
+              {
+                "type": "predicate",
+                "field": "pregnant_recent",
+                "operator": "equals",
+                "value": "yes",
+                "pass_reason": "Pregnancy or recent pregnancy may fit a WIC participant category.",
+                "fail_reason": "Pregnancy/recent pregnancy was not reported.",
+                "unknown_reason": "Pregnancy/recent-pregnancy status could open a WIC route.",
+                "requirement": "Pregnancy or recent-pregnancy category"
+              },
+              {
+                "type": "predicate",
+                "field": "child_under_5",
+                "operator": "equals",
+                "value": "yes",
+                "pass_reason": "A child under five may fit a WIC participant category.",
+                "fail_reason": "A child under five was not reported.",
+                "unknown_reason": "Whether there is a child under five could open a WIC route.",
+                "requirement": "Child-under-five category"
+              }
+            ]
+          }
+        ]
+      },
+      "next_steps": {
+        "MAY_QUALIFY": "Contact a local WIC office for the official appointment and income/nutrition review.",
+        "NEEDS_INFORMATION": "Answer the family-category question or contact WIC directly.",
+        "LIKELY_NOT_ELIGIBLE": "Use direct food and CalFresh routes; WIC staff can explain less common categories.",
+        "RULE_UNDER_REVIEW": "Use the current California WIC route."
+      },
+      "result_summaries": {
+        "DIRECT_RESOURCE": "Available to everyone without completing the eligibility survey.",
+        "LIKELY_ELIGIBLE": "Your current answers meet every rule included in this pre-screen. The official agency still decides.",
+        "MAY_QUALIFY": "Your current answers make this a useful next step, but the provider or agency must confirm remaining requirements.",
+        "NEEDS_INFORMATION": "A small number of unanswered items could change this result.",
+        "LIKELY_NOT_ELIGIBLE": "At least one current answer does not meet this pre-screen. Open the details to compare what was expected with what you entered.",
+        "RULE_UNDER_REVIEW": "SANDI will not rely on this rule until its owner reviews the current version."
+      }
+    }
+  ]
+}

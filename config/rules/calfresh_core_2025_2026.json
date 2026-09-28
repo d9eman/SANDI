@@ -1,0 +1,152 @@
+{
+  "program": {
+    "id": "calfresh",
+    "name": "CalFresh basic pre-screen",
+    "description": "A limited San Diego CalFresh pre-screen using household, gross-income, and student signals.",
+    "display_priority": 10,
+    "access_score": 95,
+    "actions": [
+      {
+        "service_id": "svc_benefitscal_apply",
+        "label": "Start the official application",
+        "kind": "primary"
+      },
+      {
+        "service_id": "svc_getcalfresh_help",
+        "label": "Get application help",
+        "kind": "secondary"
+      },
+      {
+        "service_id": "svc_211_food_navigation",
+        "label": "Talk with a navigator",
+        "kind": "secondary"
+      }
+    ]
+  },
+  "versions": [
+    {
+      "id": "calfresh-sd-2025-10-v2",
+      "effective_from": "2025-10-01",
+      "effective_to": "2026-12-30",
+      "review_due": "2026-10-15",
+      "source_label": "County of San Diego CalFresh Desk Aids: household composition, student eligibility, non-financial factors, income, and 10/2025 assistance standards",
+      "source_url": "https://www.sandiegocounty.gov/content/sdc/hhsa/programs/ssp/food_stamps.html",
+      "notice": "Pre-screen only. County eligibility staff make the final decision. Net income, deductions, verification, 2026 work rules, and current noncitizen rules can still change the result.",
+      "pass_status": "LIKELY_ELIGIBLE",
+      "unknown_status": "NEEDS_INFORMATION",
+      "fail_status": "LIKELY_NOT_ELIGIBLE",
+      "expression": {
+        "type": "all",
+        "conditions": [
+          {
+            "type": "predicate",
+            "field": "county_residence",
+            "operator": "equals",
+            "value": "San Diego",
+            "pass_reason": "The entered ZIP appears to be in San Diego County.",
+            "fail_reason": "This pilot only evaluates San Diego County routes.",
+            "unknown_reason": "A ZIP code is needed for county routing.",
+            "requirement": "San Diego County route",
+            "expected_text": "A ZIP routed to San Diego County"
+          },
+          {
+            "type": "predicate",
+            "field": "household_size",
+            "operator": "gte",
+            "value": 1,
+            "pass_reason": "A food-household size was provided.",
+            "fail_reason": "Household size must be at least one.",
+            "unknown_reason": "Food-household size is needed for the correct income limit.",
+            "requirement": "Food-household size"
+          },
+          {
+            "type": "predicate",
+            "field": "monthly_income",
+            "operator": "income_below_table",
+            "household_size_field": "household_size",
+            "table": {
+              "1": 2610,
+              "2": 3526,
+              "3": 4442,
+              "4": 5360,
+              "5": 6276,
+              "6": 7192,
+              "7": 8110,
+              "8": 9026
+            },
+            "additional_member_increment": 918,
+            "pass_reason": "Reported gross monthly income is within the 200% FPL MCE screening ceiling for the reported household size.",
+            "fail_reason": "Reported gross monthly income is above this basic 200% FPL screen; a worker should review household composition and any program-specific exception.",
+            "unknown_reason": "Approximate gross monthly income is needed for this screen.",
+            "requirement": "Gross monthly household income"
+          },
+          {
+            "type": "if_then",
+            "when": {
+              "type": "predicate",
+              "field": "student_half_time",
+              "operator": "equals",
+              "value": "yes",
+              "pass_reason": "The half-time higher-education student rule needs review.",
+              "fail_reason": "The special half-time student restriction was not reported.",
+              "unknown_reason": "Student enrollment status could change the result.",
+              "requirement": "Higher-education student status"
+            },
+            "then": {
+              "type": "all",
+              "conditions": [
+                {
+                  "type": "predicate",
+                  "field": "student_meal_plan_majority",
+                  "operator": "equals",
+                  "value": "no",
+                  "pass_reason": "A majority school meal plan was not reported.",
+                  "fail_reason": "A school meal plan providing more than half of meals may make the student ineligible as a separate CalFresh household member.",
+                  "unknown_reason": "Meal-plan information is needed for the student route.",
+                  "requirement": "School meal-plan coverage"
+                },
+                {
+                  "type": "predicate",
+                  "field": "student_exemptions",
+                  "operator": "contains_any",
+                  "values": [
+                    "work_20_hours",
+                    "work_study",
+                    "calworks_tanf",
+                    "child_under_6",
+                    "child_6_11_no_care",
+                    "single_parent_fulltime",
+                    "disabled_unfit",
+                    "age_exception",
+                    "approved_training"
+                  ],
+                  "pass_reason": "At least one potential student exemption was selected.",
+                  "fail_reason": "No listed student exemption was selected; an authorized worker should check all exceptions.",
+                  "unknown_reason": "A potential student exemption must be reviewed.",
+                  "requirement": "Student exception",
+                  "expected_text": "At least one listed student exception"
+                }
+              ]
+            },
+            "not_applicable_reason": "The special half-time student branch does not apply based on the answer provided.",
+            "label": "Student-specific CalFresh rules"
+          }
+        ]
+      },
+      "next_steps": {
+        "MAY_QUALIFY": "Use BenefitsCal, 211, GetCalFresh support, or a County Family Resource Center for the official application and calculation.",
+        "NEEDS_INFORMATION": "Answer only the missing questions you can; direct food resources remain available.",
+        "LIKELY_NOT_ELIGIBLE": "Ask a benefits worker to review household composition, student exceptions, and other pathways before relying on this result.",
+        "RULE_UNDER_REVIEW": "SANDI is refreshing this pre-screen. You can still use the official application or navigator links while the screening rules are updated."
+      },
+      "result_summaries": {
+        "DIRECT_RESOURCE": "Available to everyone without completing the eligibility survey.",
+        "LIKELY_ELIGIBLE": "Your current answers meet every rule included in this pre-screen. The official agency still decides.",
+        "MAY_QUALIFY": "Your current answers make this a useful next step, but the provider or agency must confirm remaining requirements.",
+        "NEEDS_INFORMATION": "A small number of unanswered items could change this result.",
+        "LIKELY_NOT_ELIGIBLE": "At least one current answer does not meet this pre-screen. Open the details to compare what was expected with what you entered.",
+        "RULE_UNDER_REVIEW": "SANDI is refreshing this program's screening rules. This is not caused by any answer you gave."
+      }
+    }
+  ]
+}

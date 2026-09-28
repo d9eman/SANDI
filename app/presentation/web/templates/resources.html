@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Food maps | SANDI Demo{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Profile step 1 — immediate food</p>
+    <h1>Food maps for {{ profile.value('zip_code') or 'San Diego County' }}</h1>
+    <p>Your profile is saved, but this page stays focused on finding food. Application and navigator routes are on the next page.</p>
+  </div>
+  <a class="button secondary" href="/p/{{ profile.profile_id }}/routing">Change location or urgency</a>
+</section>
+
+<div class="notice warning"><strong>Current-data boundary:</strong> SANDI opens provider-maintained maps instead of copying changing distribution schedules into a static list.</div>
+
+<div class="resource-grid">
+{% for item in map_resources %}
+  <article class="card resource-card focused-card">
+    <div class="card-topline"><span class="badge availability {{ item.availability_status|lower }}">{{ item.availability_status.replace('_',' ') }}</span><span class="muted">Official locator</span></div>
+    <h2>{{ item.provider_name }}</h2>
+    <h3>{{ item.service_name }}</h3>
+    <p>{{ item.service_description }}</p>
+    {% if item.legal_name %}<p class="field-note">Formal organization name: {{ item.legal_name }}</p>{% endif %}
+    <a class="button primary" href="/go/{{ item.service_id }}?location={{ location|urlencode }}" target="_blank" rel="noopener">Open map</a>
+    {% include "_resource_feedback.html" %}
+  </article>
+{% else %}
+  <div class="notice">No verified public locator is active.</div>
+{% endfor %}
+</div>
+
+
+{% if direct_sites %}
+<section class="section-heading">
+  <div><p class="eyebrow">Verified public site records</p><h2>Direct food locations</h2></div>
+  <p>These are shown only when a source-linked site record is public. Call-first and last-verified boundaries still apply.</p>
+</section>
+<div class="resource-grid">
+{% for item in direct_sites %}
+  <article class="card resource-card">
+    <div class="card-topline"><span class="badge availability {{ item.availability_status|lower }}">{{ item.availability_status.replace('_',' ') }}</span><span class="muted">{{ item.data_quality_status.replace('_',' ') }}</span></div>
+    <h2>{{ item.service_name }}</h2><p class="provider-byline">{{ item.provider_name }}</p>
+    <p>{{ item.service_description }}</p>
+    <dl class="details">
+      <div><dt>Location</dt><dd>{{ item.address or item.location_name }}{% if item.city %}, {{ item.city }}{% endif %} {{ item.zip_code }}</dd></div>
+      <div><dt>Hours</dt><dd>{{ item.hours_text or 'Confirm with provider' }}</dd></div>
+      <div><dt>Eligibility</dt><dd>{{ item.eligibility_summary or 'Confirm with provider' }}</dd></div>
+      {% if item.schedule_exceptions %}<div><dt>Exceptions</dt><dd>{{ item.schedule_exceptions }}</dd></div>{% endif %}
+    </dl>
+    <a class="button primary" href="/go/{{ item.service_id }}?location={{ location|urlencode }}" target="_blank" rel="noopener">Open official details</a>
+    {% include "_resource_feedback.html" %}
+  </article>
+{% endfor %}
+</div>
+{% endif %}
+
+{% if guide_resources %}
+<section class="section-heading"><div><p class="eyebrow">Additional finding tools</p><h2>Food guides</h2></div></section>
+<div class="resource-grid compact-grid">
+{% for item in guide_resources %}
+  <article class="card"><h2>{{ item.provider_name }}</h2><h3>{{ item.service_name }}</h3><p>{{ item.service_description }}</p><a class="button secondary" href="/go/{{ item.service_id }}?location={{ location|urlencode }}" target="_blank" rel="noopener">Open resource</a></article>
+{% endfor %}
+</div>
+{% endif %}
+
+<section class="card callout two-column">
+  <div><p class="eyebrow">Profile step 2</p><h2>Get connected to applications and more help.</h2><p>Continue to CalFresh application assistance, official application routes, navigation, eligibility screening, and future direct referrals.</p></div>
+  <div class="stack actions-panel">
+    <a class="button primary" href="/p/{{ profile.profile_id }}/help">Continue to more help</a>
+    <a class="button secondary" href="/p/{{ profile.profile_id }}">Save and return later</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}My profile | SANDI{% endblock %}
+{% block content %}
+<section class="profile-page">
+  {% set journey_step = 2 if progress.remaining else 3 %}{% include "_journey_timeline.html" %}
+  <div class="results-hero"><div><p class="eyebrow">My SANDI profile</p><h1>Your progress is saved.</h1><p class="muted">Profile {{ profile.profile_id }}</p></div><a class="button primary" href="/p/{{ profile.profile_id }}/questions">{% if progress.remaining %}Continue eligibility →{% else %}Review matches →{% endif %}</a></div>
+  <section class="match-dashboard four-tiles"><a href="/p/{{ profile.profile_id }}/results"><strong>{{ progress.strong_matches }}</strong><span>strong matches</span></a><a href="/p/{{ profile.profile_id }}/results"><strong>{{ progress.possible_matches }}</strong><span>possible matches</span></a><a href="/p/{{ profile.profile_id }}/referrals"><strong>{{ tickets|length }}</strong><span>referrals</span></a><a href="/p/{{ profile.profile_id }}/documents"><strong>{{ documents|length }}</strong><span>documents</span></a></section>
+  <div class="profile-actions"><a href="/food-now">Find food</a><a href="/p/{{ profile.profile_id }}/results">See match details</a><a href="/p/{{ profile.profile_id }}/documents">Add optional document</a></div>
+  <details class="card answer-details"><summary>Saved answers ({{ progress.answered }})</summary>{% for id,answer in profile.answers.items() %}<div class="answer-row"><div><strong>{{ questions[id].text(profile.language) if id in questions else id.replace('_',' ')|title }}</strong><span>{{ answer.state.value }}</span></div><div>{{ answer.value if answer.value is not none else '—' }} {% if id in questions %}<a href="/p/{{ profile.profile_id }}/questions?question={{ id }}">Edit</a>{% endif %}</div></div>{% else %}<p>No survey answers yet.</p>{% endfor %}</details>
+</section>
+{% endblock %}

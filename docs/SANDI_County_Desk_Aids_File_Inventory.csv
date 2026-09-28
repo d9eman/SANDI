@@ -1,0 +1,48 @@
+file,pages,source_group,program_scope,primary_content,SANDI_use,recommended_phase
+02. Household Composition.pdf,20,CalFresh eligibility,CalFresh,"Food household, mandatory household members, institutional/boarder rules",Shared household question/help text,Phase 1
+03. Student Eligibility (06-2026).pdf,27,CalFresh eligibility,CalFresh,"Half-time student restriction, meal plan, exemption branches",Conditional student questions,Phase 1.5
+04. Citizenship and Funding.pdf,46,CalFresh eligibility,CalFresh/CFAP,Citizenship/noncitizen categories and funding,"Specialist, versioned immigration route; do not auto-deny",Phase 2
+05. Non-Financial.pdf,13,CalFresh eligibility,CalFresh,"Identity, county residency, SSN",Application-readiness checklist after user action,Phase 1.5
+06. CalFresh Income.pdf,20,CalFresh eligibility,CalFresh,"Income types, frequency, prospective budgeting, thresholds",Gross-income pre-screen and later official calculation,Phase 1
+07. Deductions.pdf,43,CalFresh eligibility,CalFresh,"Deductions, shelter/utilities, MCE/resources, IRT",Expedited and calculation-support fields; not full approval,Phase 1-2
+08. Sponsorship and Deeming (3-2026).pdf,51,CalFresh eligibility,CalFresh/CFAP,Sponsor/deeming and indigence analysis,High-sensitivity specialist branch only,Phase 2
+09. CalFresh Verifications.pdf,39,Application workflow,CalFresh,"Application, interview, verification, filing date",Next-step checklist; not early intake,Phase 1.5
+10. Application Process.pdf,18,Application workflow,CalFresh,"Application, interview, verification, filing date",Next-step checklist; not early intake,Phase 1.5
+11. Expedited Services.pdf,19,CalFresh eligibility,CalFresh,"Three expedited-service tests, interview, identity timing",Crisis indicator after immediate food options,Phase 1
+12. CalFresh Anticipated Income.pdf,19,CalFresh eligibility,CalFresh,"Income types, frequency, prospective budgeting, thresholds",Gross-income pre-screen and later official calculation,Phase 1
+13. CalFresh Budgeting Resources & MCE.pdf,45,CalFresh eligibility,CalFresh,"Deductions, shelter/utilities, MCE/resources, IRT",Expedited and calculation-support fields; not full approval,Phase 1-2
+14. Calfresh WINS & Aid Codes.pdf,22,CalFresh maintenance/work,CalFresh,"Work registration, ABAWD, CFET, WINS",Conditional support route; rules changing in 2026,Phase 2
+"15. CalFresh Work Registration, ABAWD Time Limit, and CFET.pdf",41,CalFresh maintenance/work,CalFresh,"Work registration, ABAWD, CFET, WINS",Conditional support route; rules changing in 2026,Phase 2
+16. Journals and Documentation Standards.pdf,16,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+16a. Imaging.pdf,20,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+17. CalFresh Semi-Annual Reporting.pdf,48,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+18. CalFresh Mid Period Changes.pdf,20,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+19. Calfresh Recertifications.pdf,16,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+1a. 10.2025 CalFresh Assistance Standards Table.pdf,2,CalFresh eligibility,CalFresh,"Income types, frequency, prospective budgeting, thresholds",Gross-income pre-screen and later official calculation,Phase 1
+1b. CF Aid Payment Conversion Factors.pdf,1,CalFresh eligibility,CalFresh,"Income types, frequency, prospective budgeting, thresholds",Gross-income pre-screen and later official calculation,Phase 1
+1c. SAR Cycles Table.pdf,1,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+1d. IRT Processing Flow Chart.pdf,2,CalFresh eligibility,CalFresh,"Deductions, shelter/utilities, MCE/resources, IRT",Expedited and calculation-support fields; not full approval,Phase 1-2
+1e. MCE Evaluation Flowchart.pdf,1,CalFresh eligibility,CalFresh,"Deductions, shelter/utilities, MCE/resources, IRT",Expedited and calculation-support fields; not full approval,Phase 1-2
+1f. Desk Aid SUAS for SUA Flowchart.pdf,1,CalFresh eligibility,CalFresh,"Deductions, shelter/utilities, MCE/resources, IRT",Expedited and calculation-support fields; not full approval,Phase 1-2
+1g. Work Incentive Nutrition Supplement (WINS) Desk Aid.pdf,2,CalFresh maintenance/work,CalFresh,"Work registration, ABAWD, CFET, WINS",Conditional support route; rules changing in 2026,Phase 2
+1h. 09-55 HHSA Calfresh Student Eligibility Worksheet (07-2025).pdf,2,CalFresh eligibility,CalFresh,"Half-time student restriction, meal plan, exemption branches",Conditional student questions,Phase 1.5
+1i. 09-55 HHSA CalFresh Student Eligibility Flowchart.pdf,2,CalFresh eligibility,CalFresh,"Half-time student restriction, meal plan, exemption branches",Conditional student questions,Phase 1.5
+1j. Noncitizen Eligibility and Category Descriptions.pdf,7,CalFresh eligibility,CalFresh/CFAP,Citizenship/noncitizen categories and funding,"Specialist, versioned immigration route; do not auto-deny",Phase 2
+CalSAWS/1. Multi Program Learner Guide.pdf,194,Other/reference,Multi-program,Training/reference material,Review when expanding scope,Later
+CalSAWS/10. Childcare Learner Guide.pdf,58,Multi-program eligibility,Child Care,Family/child/provider/activity/schedule/payment workflow,Later shared family/activity branch,Phase 3
+CalSAWS/11. Fiscal Learner Guide.pdf,29,Operations,Multi-program,Fiscal/clerical case operations,Not user onboarding,Later
+CalSAWS/12. RDB Learner Guide.pdf,32,Provider/resource data,All services,"Provider/resource/service hierarchy, search, duplicate control, update ownership",Provider catalog architecture,Phase 1
+CalSAWS/13. Special Investigations Learner Guide.pdf,26,Operations/security,Multi-program,Investigation/referral operations,Not user onboarding; governance/audit only,Later
+CalSAWS/2. CF.MC.GR Learner Guide.pdf,333,CalSAWS workflow,Multi-program,Shared person/household/case screens and EDBC workflow,Confirms reusable profile fields; not authoritative policy,Architecture reference
+CalSAWS/3. General Relief Learner Guide.pdf,46,Multi-program eligibility,General Relief,"County residence, employability, income, property, expenses",Reuse shared intake; add county-specific rules later,Phase 3
+CalSAWS/4. RCA Learner Guide.pdf,30,Multi-program eligibility,Refugee Cash Assistance,"Identity, immigration/refugee date, income/resources, household",Specialist branch after core profile,Phase 3
+CalSAWS/5. CAPI Learner Guide.pdf,63,Multi-program eligibility,CAPI,"Age/disability, immigration/sponsor, residence, income/resources",Specialist branch after core profile,Phase 3
+CalSAWS/8. Clerical Learner Guide.pdf,122,Operations,Multi-program,Fiscal/clerical case operations,Not user onboarding,Later
+CalSAWS/9. Employment Services Learner Guide.pdf,66,Operations/services,Employment Services,"WTW status, activities, agreements, progress, sanctions",Post-eligibility service/referral workflow,Later
+CalSAWS ILT Instructor Guide_CalFresh_CalWORKs_Medi-Cal Multi-Program Eligibility Wave 4 V5.4.pdf,226,CalSAWS workflow,Multi-program,Shared person/household/case screens and EDBC workflow,Confirms reusable profile fields; not authoritative policy,Architecture reference
+CalSAWS ILT Instructor Guide_CalFresh_Medi-Cal Multi-Program Eligibility Wave 4 V5.4.pdf,176,CalSAWS workflow,Multi-program,Shared person/household/case screens and EDBC workflow,Confirms reusable profile fields; not authoritative policy,Architecture reference
+CalSAWS ILT Instructor Guide_Child Care_Wave 4_V5.2.pdf,91,Multi-program eligibility,Child Care,Family/child/provider/activity/schedule/payment workflow,Later shared family/activity branch,Phase 3
+CalSAWS ILT Instructor Guide_General Assistance-General Relief Eligibility Wave 4 V5.4.pdf,96,Multi-program eligibility,General Relief,"County residence, employability, income, property, expenses",Reuse shared intake; add county-specific rules later,Phase 3
+CalSAWS ILT Instructor Guide_Imaging_Wave 4 V5.2.pdf,69,Operations/maintenance,CalFresh/CalSAWS,"Case documentation, imaging, reporting, recertification",Do not add to first onboarding; use for staff workflows later,Later
+CalSAWS ILT Instructor Guide_RDB Maintainer_ Wave 5 v6.2.pdf,55,Provider/resource data,All services,"Provider/resource/service hierarchy, search, duplicate control, update ownership",Provider catalog architecture,Phase 1
+calfresh_eligibility_workflow.html,0,CalFresh workflow,CalFresh,Summary eligibility workflow,Cross-check only; defer to dated desk aids and official sources,Reference

@@ -1,0 +1,587 @@
+{
+  "questions": [
+    {
+      "id": "zip_code",
+      "text_en": "What ZIP code are you in now?",
+      "text_es": "¿En qué código postal se encuentra ahora?",
+      "help_en": "This routes you to the correct county and local application options. A general ZIP is enough; a street address is not needed.",
+      "help_es": "Esto le dirige al condado y a las opciones locales correctas. Un código postal es suficiente; no se necesita una dirección.",
+      "answer_type": "text",
+      "sensitivity": 0,
+      "priority": 1,
+      "stage": "Reusable basics",
+      "group": "LOCATION",
+      "why_asked": "Used once for county routing and local program links.",
+      "conditional_note": "Reused automatically if the person already entered a ZIP in the immediate food finder.",
+      "source_refs": [
+        "County routing and residency desk aids"
+      ],
+      "placeholder": "Example: 92101"
+    },
+    {
+      "id": "age",
+      "text_en": "How old are you?",
+      "text_es": "¿Cuántos años tiene?",
+      "help_en": "Age can change WIC, Restaurant Meals, student, and other program routes.",
+      "answer_type": "number",
+      "sensitivity": 1,
+      "priority": 45,
+      "stage": "Reusable basics",
+      "group": "AGE_LIFE_STAGE",
+      "why_asked": "Used by several food-benefit pathways.",
+      "conditional_note": "Asked once and reused.",
+      "source_refs": [
+        "03. Student Eligibility (06-2026)",
+        "1a. Assistance Standards",
+        "Restaurant Meals Program"
+      ]
+    },
+    {
+      "id": "household_size",
+      "text_en": "How many people are in your CalFresh food household?",
+      "text_es": "¿Cuántas personas forman parte de su hogar de CalFresh?",
+      "help_en": "Usually include people who live together and buy and prepare food together. Spouses and children under 22 living with a parent generally must be together. An authorized worker makes the final household determination.",
+      "answer_type": "number",
+      "sensitivity": 1,
+      "priority": 10,
+      "stage": "Reusable basics",
+      "group": "HOUSEHOLD",
+      "why_asked": "Selects the correct income threshold and household calculation.",
+      "conditional_note": "Use the help text rather than asking every relationship question up front.",
+      "source_refs": [
+        "02. Household Composition",
+        "1a. Assistance Standards"
+      ]
+    },
+    {
+      "id": "monthly_income",
+      "text_en": "About how much gross income does the food household receive in a month, before taxes?",
+      "text_es": "Aproximadamente, ¿cuánto ingreso bruto recibe el hogar al mes antes de impuestos?",
+      "help_en": "An estimate is enough for this pre-screen. Official workers review income frequency, exclusions, and deductions.",
+      "answer_type": "number",
+      "sensitivity": 2,
+      "priority": 15,
+      "stage": "Reusable basics",
+      "group": "FINANCIAL",
+      "why_asked": "Supports the CalFresh gross-income screen and expedited-service indicator.",
+      "conditional_note": "Do not ask for documents during pre-screening.",
+      "source_refs": [
+        "06. CalFresh Income",
+        "12. Anticipated Income",
+        "1a. Assistance Standards"
+      ],
+      "unit": "USD per month",
+      "ask_after": [
+        "household_size"
+      ]
+    },
+    {
+      "id": "student_half_time",
+      "text_en": "Are you enrolled at least half-time in a college or other institution of higher education?",
+      "text_es": "¿Está inscrito al menos a medio tiempo en una institución de educación superior?",
+      "help_en": "A special student rule may apply. If no, student-exemption questions are skipped.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        }
+      ],
+      "sensitivity": 1,
+      "priority": 35,
+      "stage": "Conditional",
+      "group": "STUDENT",
+      "why_asked": "Determines whether the CalFresh student restriction needs review.",
+      "conditional_note": "Only student-specific follow-ups should appear after Yes.",
+      "source_refs": [
+        "03. Student Eligibility (06-2026)",
+        "1h. Student Worksheet",
+        "1i. Student Flowchart"
+      ]
+    },
+    {
+      "id": "student_meal_plan_majority",
+      "text_en": "Does a school meal plan provide more than half of your meals?",
+      "text_es": "¿Un plan de comidas escolar proporciona más de la mitad de sus comidas?",
+      "help_en": "This is only used when the half-time student rule applies.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        }
+      ],
+      "sensitivity": 1,
+      "priority": 36,
+      "stage": "Conditional",
+      "group": "STUDENT",
+      "why_asked": "A majority meal plan can change the food-household route.",
+      "conditional_note": "Ask only when student_half_time is Yes.",
+      "source_refs": [
+        "02. Household Composition",
+        "03. Student Eligibility (06-2026)"
+      ]
+    },
+    {
+      "id": "student_exemptions",
+      "text_en": "Do any of these student exceptions describe you?",
+      "text_es": "¿Alguna de estas excepciones para estudiantes le describe?",
+      "help_en": "Select every option that may apply. A county worker verifies the final exception.",
+      "answer_type": "multi_select",
+      "options": [
+        {
+          "value": "work_20_hours",
+          "label_en": "Working at least 20 hours per week / 80 hours per month",
+          "label_es": "Trabajo al menos 20 horas por semana"
+        },
+        {
+          "value": "work_study",
+          "label_en": "Approved for work-study and expect to participate",
+          "label_es": "Aprobado para estudio y trabajo"
+        },
+        {
+          "value": "calworks_tanf",
+          "label_en": "Receiving CalWORKs/TANF-funded assistance",
+          "label_es": "Recibo CalWORKs/TANF"
+        },
+        {
+          "value": "child_under_6",
+          "label_en": "Responsible for a child under age 6",
+          "label_es": "Responsable de un niño menor de 6 años"
+        },
+        {
+          "value": "child_6_11_no_care",
+          "label_en": "Responsible for a child age 6–11 without adequate child care",
+          "label_es": "Responsable de un niño de 6 a 11 años sin cuidado adecuado"
+        },
+        {
+          "value": "single_parent_fulltime",
+          "label_en": "Single parent, full-time student, with a child under 12",
+          "label_es": "Padre/madre soltero, estudiante de tiempo completo, con hijo menor de 12"
+        },
+        {
+          "value": "disabled_unfit",
+          "label_en": "Disability or otherwise unfit for employment",
+          "label_es": "Discapacidad o no apto para empleo"
+        },
+        {
+          "value": "age_exception",
+          "label_en": "Under 18 or age 50 or older",
+          "label_es": "Menor de 18 o de 50 años o más"
+        },
+        {
+          "value": "approved_training",
+          "label_en": "In an approved training/employment program",
+          "label_es": "En un programa aprobado de capacitación/empleo"
+        },
+        {
+          "value": "none",
+          "label_en": "None of these / not sure",
+          "label_es": "Ninguna / no estoy seguro"
+        }
+      ],
+      "sensitivity": 2,
+      "priority": 37,
+      "stage": "Conditional",
+      "group": "STUDENT",
+      "why_asked": "Checks the most common shared student exemptions without separate forms.",
+      "conditional_note": "Ask only when student_half_time is Yes.",
+      "source_refs": [
+        "03. Student Eligibility (06-2026)",
+        "1h. Student Worksheet",
+        "1i. Student Flowchart"
+      ]
+    },
+    {
+      "id": "liquid_resources",
+      "text_en": "About how much cash and money in checking or savings is available to the household right now?",
+      "text_es": "¿Cuánto dinero en efectivo y en cuentas está disponible ahora?",
+      "help_en": "This is used only for the expedited CalFresh indicator, not as a general asset test for most applicants.",
+      "answer_type": "number",
+      "sensitivity": 2,
+      "priority": 65,
+      "stage": "Crisis follow-up",
+      "group": "EXPEDITED",
+      "why_asked": "One of the expedited-service tests uses immediately available liquid resources.",
+      "conditional_note": "Ask after basic routing, not before showing food.",
+      "source_refs": [
+        "11. Expedited Services",
+        "13. Budgeting Resources & MCE"
+      ],
+      "unit": "USD available now"
+    },
+    {
+      "id": "monthly_shelter_cost",
+      "text_en": "About how much does the household pay each month for rent, mortgage, or shelter?",
+      "text_es": "¿Cuánto paga el hogar al mes por alquiler, hipoteca o refugio?",
+      "help_en": "An estimate is used only for the expedited-service comparison and later deduction guidance.",
+      "answer_type": "number",
+      "sensitivity": 2,
+      "priority": 71,
+      "stage": "Crisis follow-up",
+      "group": "EXPEDITED_DEDUCTIONS",
+      "why_asked": "Can identify crisis households and is reusable for deduction guidance.",
+      "conditional_note": "Unknown is allowed.",
+      "source_refs": [
+        "07. Deductions",
+        "11. Expedited Services"
+      ],
+      "unit": "USD per month",
+      "ask_after": [
+        "liquid_resources"
+      ]
+    },
+    {
+      "id": "monthly_utility_cost",
+      "text_en": "About how much does the household pay each month for utilities?",
+      "text_es": "¿Cuánto paga el hogar al mes por servicios públicos?",
+      "help_en": "An estimate is enough for the expedited comparison. Official budgeting uses standardized utility allowances.",
+      "answer_type": "number",
+      "sensitivity": 2,
+      "priority": 72,
+      "stage": "Crisis follow-up",
+      "group": "EXPEDITED_DEDUCTIONS",
+      "why_asked": "Completes the expedited shelter-cost comparison.",
+      "conditional_note": "Unknown is allowed.",
+      "source_refs": [
+        "07. Deductions",
+        "11. Expedited Services",
+        "1f. SUA Flowchart"
+      ],
+      "unit": "USD per month",
+      "ask_after": [
+        "liquid_resources"
+      ]
+    },
+    {
+      "id": "migrant_seasonal_farmworker",
+      "text_en": "Is anyone in the household a migrant or seasonal farmworker with very little money available now?",
+      "text_es": "¿Alguien en el hogar es trabajador agrícola migrante o de temporada con muy poco dinero disponible?",
+      "help_en": "This can activate a separate expedited-service test.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        }
+      ],
+      "sensitivity": 2,
+      "priority": 73,
+      "stage": "Crisis follow-up",
+      "group": "EXPEDITED",
+      "why_asked": "A separate expedited criterion applies to some migrant/seasonal farmworker households.",
+      "conditional_note": "Ask only after immediate resources are shown.",
+      "source_refs": [
+        "11. Expedited Services"
+      ]
+    },
+    {
+      "id": "current_calfresh",
+      "text_en": "Does anyone in the household currently receive CalFresh?",
+      "text_es": "¿Alguien en el hogar recibe CalFresh actualmente?",
+      "help_en": "This affects Restaurant Meals routing and can prevent duplicate application guidance.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        }
+      ],
+      "sensitivity": 1,
+      "priority": 20,
+      "stage": "Reusable basics",
+      "group": "CURRENT_BENEFITS",
+      "why_asked": "Reused by Restaurant Meals and application-routing logic.",
+      "conditional_note": "Does not require a case number.",
+      "source_refs": [
+        "Restaurant Meals Program",
+        "14. WINS & Aid Codes"
+      ]
+    },
+    {
+      "id": "housing_status",
+      "text_en": "Which best describes where you are staying?",
+      "text_es": "¿Cuál describe mejor dónde se está quedando?",
+      "help_en": "This can improve food routing and Restaurant Meals screening. A fixed address is not required for CalFresh.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "stable",
+          "label_en": "Stable housing",
+          "label_es": "Vivienda estable"
+        },
+        {
+          "value": "temporary",
+          "label_en": "Temporarily staying with others / motel",
+          "label_es": "Alojamiento temporal"
+        },
+        {
+          "value": "sheltered",
+          "label_en": "Emergency or transitional shelter",
+          "label_es": "Refugio"
+        },
+        {
+          "value": "unsheltered",
+          "label_en": "Outside / vehicle / place not meant for housing",
+          "label_es": "Sin refugio"
+        },
+        {
+          "value": "no_fixed_address",
+          "label_en": "No fixed address",
+          "label_es": "Sin dirección fija"
+        },
+        {
+          "value": "prefer_not",
+          "label_en": "Prefer not to answer",
+          "label_es": "Prefiero no responder"
+        }
+      ],
+      "sensitivity": 2,
+      "priority": 46,
+      "stage": "Situation flags",
+      "group": "HOUSING",
+      "why_asked": "Supports access mode, expedited context, and RMP routing.",
+      "conditional_note": "Never block direct resources.",
+      "source_refs": [
+        "05. Non-Financial",
+        "Restaurant Meals Program"
+      ]
+    },
+    {
+      "id": "disability",
+      "text_en": "Does anyone in the CalFresh household have a disability that may affect program rules?",
+      "text_es": "¿Alguien en el hogar tiene una discapacidad que pueda afectar las reglas?",
+      "help_en": "This may affect Restaurant Meals, deductions, household rules, and later work-rule review.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        },
+        {
+          "value": "prefer_not",
+          "label_en": "Prefer not to answer",
+          "label_es": "Prefiero no responder"
+        }
+      ],
+      "sensitivity": 3,
+      "priority": 47,
+      "stage": "Situation flags",
+      "group": "DISABILITY_OLDER_ADULT",
+      "why_asked": "Reused across multiple pathways.",
+      "conditional_note": "Do not ask for diagnosis or documentation in the demo.",
+      "source_refs": [
+        "07. Deductions",
+        "13. Budgeting Resources & MCE",
+        "15. Work Registration/ABAWD"
+      ]
+    },
+    {
+      "id": "pregnant_recent",
+      "text_en": "Is anyone pregnant or recently pregnant?",
+      "text_es": "¿Alguien está embarazada o estuvo embarazada recientemente?",
+      "help_en": "This can open a WIC route and may affect other rules.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        },
+        {
+          "value": "prefer_not",
+          "label_en": "Prefer not to answer",
+          "label_es": "Prefiero no responder"
+        }
+      ],
+      "sensitivity": 3,
+      "priority": 26,
+      "stage": "Situation flags",
+      "group": "FAMILY_WIC",
+      "why_asked": "Shared WIC and work-rule flag.",
+      "conditional_note": "Unknown and skip remain valid.",
+      "source_refs": [
+        "California WIC",
+        "15. Work Registration/ABAWD"
+      ]
+    },
+    {
+      "id": "child_under_5",
+      "text_en": "Does the household include a child under age five?",
+      "text_es": "¿Hay un niño menor de cinco años en el hogar?",
+      "help_en": "This can open a WIC route.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        }
+      ],
+      "sensitivity": 1,
+      "priority": 25,
+      "stage": "Situation flags",
+      "group": "FAMILY_WIC",
+      "why_asked": "Shared WIC family-category question.",
+      "conditional_note": "Ask once and reuse.",
+      "source_refs": [
+        "California WIC"
+      ]
+    },
+    {
+      "id": "current_benefits",
+      "text_en": "Which benefits does anyone in the household currently receive?",
+      "text_es": "¿Qué beneficios recibe actualmente alguien en el hogar?",
+      "help_en": "Select only what you know. This can reduce duplicate questions later.",
+      "answer_type": "multi_select",
+      "options": [
+        {
+          "value": "calfresh",
+          "label_en": "CalFresh",
+          "label_es": "CalFresh"
+        },
+        {
+          "value": "medi_cal",
+          "label_en": "Medi-Cal",
+          "label_es": "Medi-Cal"
+        },
+        {
+          "value": "calworks",
+          "label_en": "CalWORKs",
+          "label_es": "CalWORKs"
+        },
+        {
+          "value": "wic",
+          "label_en": "WIC",
+          "label_es": "WIC"
+        },
+        {
+          "value": "ssi_ssp",
+          "label_en": "SSI/SSP",
+          "label_es": "SSI/SSP"
+        },
+        {
+          "value": "none",
+          "label_en": "None / not sure",
+          "label_es": "Ninguno / no estoy seguro"
+        }
+      ],
+      "sensitivity": 2,
+      "priority": 90,
+      "stage": "Conditional",
+      "group": "CURRENT_BENEFITS",
+      "why_asked": "Can simplify future adjunctive-eligibility and application flows.",
+      "conditional_note": "Not required for the current core screen.",
+      "source_refs": [
+        "CalSAWS Multi-Program Guides",
+        "14. WINS & Aid Codes"
+      ]
+    },
+    {
+      "id": "veteran_status",
+      "text_en": "Have you served in the U.S. military?",
+      "text_es": "¿Ha servido en las Fuerzas Armadas de los Estados Unidos?",
+      "help_en": "Some future veteran-specific services may use this answer. The current food pilot will not ask it unless an active program needs it.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        },
+        {
+          "value": "prefer_not",
+          "label_en": "Prefer not to answer",
+          "label_es": "Prefiero no responder"
+        }
+      ],
+      "sensitivity": 2,
+      "priority": 120,
+      "stage": "Future pathways",
+      "group": "VETERAN",
+      "why_asked": "Reusable signal for future veteran-specific services.",
+      "conditional_note": "Dormant until an approved active program references veteran_status.",
+      "source_refs": [
+        "Team UX feedback — Aug 2026"
+      ]
+    },
+    {
+      "id": "foster_care_history",
+      "text_en": "Have you ever been in foster care?",
+      "text_es": "¿Ha estado alguna vez en cuidado de crianza?",
+      "help_en": "Some youth and former-foster-youth programs may use this answer. The current food pilot will not ask it unless an active program needs it.",
+      "answer_type": "single_select",
+      "options": [
+        {
+          "value": "yes",
+          "label_en": "Yes",
+          "label_es": "Sí"
+        },
+        {
+          "value": "no",
+          "label_en": "No",
+          "label_es": "No"
+        },
+        {
+          "value": "prefer_not",
+          "label_en": "Prefer not to answer",
+          "label_es": "Prefiero no responder"
+        }
+      ],
+      "sensitivity": 3,
+      "priority": 125,
+      "stage": "Future pathways",
+      "group": "FOSTER_CARE",
+      "why_asked": "Reusable signal for future foster-youth services.",
+      "conditional_note": "Dormant until an approved active program references foster_care_history.",
+      "source_refs": [
+        "Team UX feedback — Aug 2026"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Question map | SANDI Demo{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Question planner input</p>
+    <h1>Approved shared-question catalog</h1>
+    <p>Questions live in <code>config/questions.json</code>. The planner asks only an unanswered field that can still change an active program result.</p>
+  </div>
+  <div class="action-row">
+    <a class="button primary" href="/staff/eligibility-matrix.csv">Download rule/question matrix</a>
+    <a class="button secondary" href="/staff">Back</a>
+  </div>
+</section>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Planner order</th><th>Question / field</th><th>Group</th><th>Used by</th><th>Asked after</th><th>Why it matters</th><th>Sources</th></tr></thead>
+  <tbody>
+  {% for q in questions %}
+    <tr>
+      <td>S{{ q.sensitivity }} / P{{ q.priority }}</td>
+      <td><strong>{{ q.text_en }}</strong><br><code>{{ q.question_id }}</code><br><span class="muted">{{ q.answer_type }}{% if q.unit %} · {{ q.unit }}{% endif %}</span></td>
+      <td>{{ q.group }}<br><span class="muted">stage {{ q.stage }}</span></td>
+      <td>{{ usage[q.question_id]|join(', ') if usage[q.question_id] else 'Catalog only / future phase' }}</td>
+      <td>{{ q.ask_after|join(', ') if q.ask_after else 'No dependency' }}</td>
+      <td>{{ q.why_asked }}{% if q.conditional_note %}<br><span class="muted">{{ q.conditional_note }}</span>{% endif %}</td>
+      <td>{{ q.source_refs|join('; ') }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

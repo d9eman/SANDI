@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}SANDI | Get help{% endblock %}
+{% block content %}
+<section class="home-hero">
+  <p class="eyebrow">What do you need today?</p>
+  <h1>Get food now, or check programs you may qualify for.</h1>
+  <p class="lede">Two paths. No long intake form before help.</p>
+</section>
+<section class="start-paths clean-start-paths" aria-label="Choose how to begin">
+  <a class="path-card food-path" href="/food-now"><span class="path-icon" aria-hidden="true">🍎</span><span><small>Immediate help</small><strong>Find food near me</strong><em>No profile required</em></span><b>→</b></a>
+  <a class="path-card eligibility-path" href="{% if current_profile_id %}/p/{{ current_profile_id }}/questions{% else %}/profile/start{% endif %}"><span class="path-icon" aria-hidden="true">✓</span><span><small>Benefits & services</small><strong>{% if current_profile_id %}Continue my eligibility check{% else %}Check what I qualify for{% endif %}</strong><em>Answer once, reuse everywhere</em></span><b>→</b></a>
+</section>
+{% if not current_profile_id %}<p class="center-note">Already started? <a href="/return">Return to a saved profile</a>.</p>{% endif %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from "_assessment_card.html" import assessment_card with context %}
+{% block title %}Your matches | SANDI{% endblock %}
+{% block content %}
+<section class="results-page">
+  {% set journey_step = 3 %}{% include "_journey_timeline.html" %}
+
+  <div class="results-hero">
+    <div>
+      <p class="eyebrow">Your matches</p>
+      <h1>Start with the best next step.</h1>
+      <p>Strong matches come first. Details stay hidden until you want them.</p>
+    </div>
+    {% if next_question %}<a class="button primary" href="/p/{{ profile.profile_id }}/questions">Keep checking →</a>{% endif %}
+  </div>
+
+  <section class="match-dashboard" aria-label="Match summary">
+    <div><strong>{{ groups.best|length }}</strong><span>strong match{% if groups.best|length != 1 %}es{% endif %}</span></div>
+    <div><strong>{{ groups.possible|length }}</strong><span>worth checking</span></div>
+    <div><strong>{{ progress.answered }}</strong><span>answers saved</span></div>
+  </section>
+
+  <div class="food-shortcut tiny-shortcut"><span>Need food now?</span><a href="/food-now">Open food finder →</a></div>
+
+  {% if groups.best %}
+    <section class="results-section clean-results">
+      <p class="eyebrow">Best starting point{% if groups.best|length > 1 %}s{% endif %}</p>
+      <div class="result-grid">{% for assessment in groups.best %}{{ assessment_card(assessment, loop.first) }}{% endfor %}</div>
+    </section>
+  {% endif %}
+
+  {% if groups.possible %}
+    <section class="results-section clean-results">
+      <details {% if not groups.best %}open{% endif %}>
+        <summary><strong>{{ groups.possible|length }} more program{% if groups.possible|length != 1 %}s{% endif %} worth checking</strong></summary>
+        <div class="result-grid">{% for assessment in groups.possible %}{{ assessment_card(assessment) }}{% endfor %}</div>
+      </details>
+    </section>
+  {% endif %}
+
+  {% if groups.updating %}
+    <section class="results-section clean-results maintenance-results">
+      <details>
+        <summary>{{ groups.updating|length }} program screening rule{% if groups.updating|length != 1 %}s are{% else %} is{% endif %} being updated</summary>
+        <p class="field-note">These are not failed matches. SANDI is waiting for a current reviewed rule before showing an eligibility result.</p>
+        <div class="result-grid">{% for assessment in groups.updating %}{{ assessment_card(assessment) }}{% endfor %}</div>
+      </details>
+    </section>
+  {% endif %}
+
+  {% if groups.other %}
+    <section class="results-section clean-results">
+      <details>
+        <summary>{{ groups.other|length }} program{% if groups.other|length != 1 %}s{% endif %} that do not currently match</summary>
+        <div class="result-grid">{% for assessment in groups.other %}{{ assessment_card(assessment) }}{% endfor %}</div>
+      </details>
+    </section>
+  {% endif %}
+
+  <div class="bottom-actions">
+    <a class="button secondary" href="/p/{{ profile.profile_id }}">Save & view profile</a>
+    {% if next_question %}<a class="button primary" href="/p/{{ profile.profile_id }}/questions">Answer another question</a>{% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+SANDI v4.4 Validation Report
+============================
+
+Validated on 2026-09-28.
+
+Checks performed:
+- python scripts/validate_project.py
+- python scripts/export_eligibility_matrix.py
+- python -m pytest -q
+- python -m compileall -q app tests scripts
+
+Result:
+- Configuration validation: PASSED
+- Questions: 19
+- Active rule versions: 5
+- Provider/service rows: 18
+- Automated tests: 45 PASSED
+- Python compilation: PASSED
+
+Regression coverage added in v4.4 includes:
+- Rule-review status does not masquerade as a user eligibility failure.
+- Rule-review UI never exposes internal 'fixture' wording or fake expected-vs-actual requirements.
+- Rule-review assessments are grouped separately from true non-matches.
+- Timeline connector CSS no longer crosses step labels.
+- Answer parsing is reusable outside FastAPI routes.
+- Existing profile, eligibility, resource, referral, document, and authentication tests remain green.
+
+Important boundary:
+These tests validate application behavior and code paths. They do not substitute for a production security review, live provider-data verification, or formal accessibility/usability testing with end users.

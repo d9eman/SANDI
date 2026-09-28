@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Add provider | SANDI Demo{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">Provider catalog</p><h1>Add one organization, service, and location</h1><p>Keep the organization identity separate from the service it offers. New records default to restricted and under review until verified.</p></div></section>
+<form method="post" action="/provider/new" class="card stack">
+  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+  <h2>1. Organization</h2>
+  <div class="two-column"><label>Public/display name<input name="provider_name" required placeholder="San Diego Food Bank"></label><label>Legal name <span class="optional">optional</span><input name="legal_name" placeholder="Jacobs & Cushman San Diego Food Bank"></label></div>
+  <div class="two-column"><label>Organization phone<input name="phone"></label><label>Organization website<input name="website" type="url"></label></div>
+  <div class="two-column"><label>Partner status<select name="partner_status"><option value="not_contacted">Not contacted</option><option value="contacted">Contacted</option><option value="verification_in_progress">Verification in progress</option><option value="pilot_partner">Pilot partner</option><option value="active_partner">Active partner</option><option value="external_system">External system</option></select></label><label>Organization visibility<select name="public_visibility"><option value="PUBLIC">Public organization identity</option><option value="RESTRICTED">Restricted organization</option><option value="NOT_SHARED">Not shared</option></select></label></div>
+
+  <h2>2. Service</h2>
+  <label>Service name<input name="service_name" required placeholder="Food pantry pickup"></label>
+  <div class="two-column"><label>User journey stage<select name="journey_stage"><option value="immediate_food">Immediate food / map</option><option value="more_help">Applications and navigation</option><option value="direct_help" selected>Direct provider follow-up</option></select></label><label>Service visibility<select name="service_public_visibility"><option value="RESTRICTED">Restricted until service is verified</option><option value="PUBLIC">Public service</option><option value="NOT_SHARED">Not shared</option></select></label></div>
+  <div class="two-column"><label>Service mode<select name="service_mode"><option value="direct_service">Direct service</option><option value="external_locator">External map/locator</option><option value="external_contact">External contact</option><option value="external_application">External application</option><option value="external_application_support">Application support</option><option value="phone_or_web">Phone or web navigation</option><option value="phone_or_in_person">Phone or in-person</option></select></label><div></div></div>
+  <label>Description<textarea name="description" rows="3"></textarea></label>
+  <label>Eligibility summary<textarea name="eligibility_summary" rows="3" placeholder="Who can use this service, in plain language"></textarea></label>
+  <div class="two-column"><label>Requirement group<input name="eligibility_group" value="SITE_SPECIFIC_FOOD_DISTRIBUTION"></label><label>Data quality<select name="data_quality_status"><option value="under_review">Under review</option><option value="partner_supplied">Partner supplied</option><option value="verified">Verified</option><option value="official_source">Official source</option><option value="public_source">Public source</option><option value="stale">Stale</option><option value="conflicting">Conflicting</option></select></label></div>
+  <label>Documentation and intake notes<textarea name="documentation_notes" rows="3" placeholder="ID, proof, appointment, registration, or application requirements"></textarea></label>
+  <label class="choice"><input type="checkbox" name="call_first" value="true"> Tell users to call or confirm before traveling</label>
+  <label class="choice"><input type="checkbox" name="referral_enabled" value="true"> This provider has approved and staffed a SANDI referral workflow</label>
+
+  <h2>3. Location and schedule</h2>
+  <label>Location name<input name="location_name" placeholder="Centre City Corps pantry"></label>
+  <div class="two-column"><label>Street address<input name="address"></label><label>ZIP<input name="zip_code"></label></div>
+  <div class="two-column"><label>City<input name="city" value="San Diego"></label><label>State<input name="state" value="CA"></label></div>
+  <div class="two-column"><label>Latitude <span class="optional">for SANDI map</span><input name="latitude" inputmode="decimal"></label><label>Longitude <span class="optional">for SANDI map</span><input name="longitude" inputmode="decimal"></label></div>
+  <label>Hours<input name="hours_text" value="Call to verify"></label>
+  <label>Schedule exceptions / closures<textarea name="schedule_exceptions" rows="2"></textarea></label>
+  <div class="two-column"><label>Service area<input name="service_area" value="San Diego County"></label><label>Transportation notes<input name="transport_notes"></label></div>
+  <div class="two-column"><label>Languages<input name="languages"></label><label>Accessibility<input name="accessibility"></label></div>
+
+  <h2>4. Source and freshness</h2>
+  <div class="two-column"><label>Source URL<input name="source_url" type="url"></label><label>Last verified at<input name="last_verified_at" type="datetime-local"></label></div>
+  <div class="two-column"><label>Availability<select name="availability_status"><option>UNKNOWN</option><option>AVAILABLE</option><option>LIMITED</option><option>FULL</option><option>CLOSED</option><option>CALL_TO_VERIFY</option></select></label><label>Availability visibility<select name="availability_visibility"><option>PUBLIC</option><option>RESTRICTED</option><option>NOT_SHARED</option></select></label></div>
+  <button class="button primary" type="submit">Add reviewed record</button>
+</form>
+{% endblock %}

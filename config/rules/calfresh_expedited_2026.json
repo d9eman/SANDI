@@ -1,0 +1,122 @@
+{
+  "program": {
+    "id": "calfresh_expedited",
+    "name": "CalFresh expedited-service indicator",
+    "description": "Checks the three crisis indicators described in the County expedited-services desk aid.",
+    "display_priority": 60,
+    "access_score": 60,
+    "actions": [
+      {
+        "service_id": "svc_211_food_navigation",
+        "label": "Ask for expedited screening",
+        "kind": "primary"
+      },
+      {
+        "service_id": "svc_county_access",
+        "label": "Contact County Access",
+        "kind": "secondary"
+      }
+    ]
+  },
+  "versions": [
+    {
+      "id": "calfresh-expedited-sd-v2",
+      "effective_from": "2026-01-01",
+      "effective_to": "2026-12-31",
+      "review_due": "2026-10-15",
+      "source_label": "County of San Diego CalFresh Desk Aid 11: Expedited Services",
+      "source_url": "https://www.sandiegocounty.gov/content/sdc/hhsa/programs/ssp/food_stamps/submitting_an_application.html",
+      "notice": "Indicator only. The County decides expedited eligibility; an interview and identity verification are still required before issuance.",
+      "pass_status": "MAY_QUALIFY",
+      "unknown_status": "NEEDS_INFORMATION",
+      "fail_status": "LIKELY_NOT_ELIGIBLE",
+      "expression": {
+        "type": "any",
+        "conditions": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "type": "predicate",
+                "field": "monthly_income",
+                "operator": "lt",
+                "value": 150,
+                "pass_reason": "Reported monthly gross income is below $150.",
+                "fail_reason": "The under-$150 income test was not met.",
+                "unknown_reason": "Monthly income is needed for the first expedited test.",
+                "requirement": "Gross monthly household income"
+              },
+              {
+                "type": "predicate",
+                "field": "liquid_resources",
+                "operator": "lte",
+                "value": 100,
+                "pass_reason": "Reported liquid resources are $100 or less.",
+                "fail_reason": "The $100 liquid-resource test was not met.",
+                "unknown_reason": "Liquid resources are needed for the expedited test.",
+                "requirement": "Cash and liquid resources available now"
+              }
+            ]
+          },
+          {
+            "type": "sum_compare",
+            "left_fields": [
+              "monthly_income",
+              "liquid_resources"
+            ],
+            "operator": "lt",
+            "right_fields": [
+              "monthly_shelter_cost",
+              "monthly_utility_cost"
+            ],
+            "pass_reason": "Reported income plus liquid resources are less than reported shelter and utility costs.",
+            "fail_reason": "The shelter-cost comparison was not met.",
+            "unknown_reason": "Income, liquid resources, shelter cost, and utilities are needed for this comparison.",
+            "requirement": "Expedited shelter-cost comparison",
+            "expected_text": "Income plus liquid resources is less than shelter plus utility costs",
+            "actual_template": "Income + resources: ${left}; shelter + utilities: ${right}"
+          },
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "type": "predicate",
+                "field": "migrant_seasonal_farmworker",
+                "operator": "equals",
+                "value": "yes",
+                "pass_reason": "A migrant/seasonal farmworker household was reported.",
+                "fail_reason": "The migrant/seasonal farmworker test was not selected.",
+                "unknown_reason": "Farmworker status is needed for this expedited branch.",
+                "requirement": "Migrant or seasonal farmworker crisis route"
+              },
+              {
+                "type": "predicate",
+                "field": "liquid_resources",
+                "operator": "lte",
+                "value": 100,
+                "pass_reason": "Reported liquid resources are $100 or less.",
+                "fail_reason": "The $100 liquid-resource test was not met.",
+                "unknown_reason": "Liquid resources are needed for this expedited branch.",
+                "requirement": "Cash and liquid resources available now"
+              }
+            ]
+          }
+        ]
+      },
+      "next_steps": {
+        "MAY_QUALIFY": "Tell the County, 211 enrollment worker, or application partner that you need expedited CalFresh and submit identity proof as quickly as possible.",
+        "NEEDS_INFORMATION": "You can skip these questions and still use immediate food resources; a worker can screen expedited service by phone.",
+        "LIKELY_NOT_ELIGIBLE": "The three simplified crisis indicators were not met based on current answers; ordinary CalFresh processing may still be available.",
+        "RULE_UNDER_REVIEW": "Ask the County to screen current expedited rules."
+      },
+      "result_summaries": {
+        "DIRECT_RESOURCE": "Available to everyone without completing the eligibility survey.",
+        "LIKELY_ELIGIBLE": "Your current answers meet every rule included in this pre-screen. The official agency still decides.",
+        "MAY_QUALIFY": "Your current answers make this a useful next step, but the provider or agency must confirm remaining requirements.",
+        "NEEDS_INFORMATION": "A small number of unanswered items could change this result.",
+        "LIKELY_NOT_ELIGIBLE": "At least one current answer does not meet this pre-screen. Open the details to compare what was expected with what you entered.",
+        "RULE_UNDER_REVIEW": "SANDI will not rely on this rule until its owner reviews the current version."
+      }
+    }
+  ]
+}

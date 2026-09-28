@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Basic routing | SANDI Demo{% endblock %}
+{% block content %}
+<section class="narrow">
+  <p class="eyebrow">Stage 1 of the food flow</p>
+  <h1>Where and when do you need food?</h1>
+  <p>These answers are used immediately. A ZIP is optional; leaving it blank returns broader countywide demo resources.</p>
+  <form method="post" action="/p/{{ profile.profile_id }}/routing" class="card stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>ZIP code or area
+      <input name="zip_code" inputmode="numeric" maxlength="5" value="{{ profile.value('zip_code') or '' }}" placeholder="92101">
+    </label>
+    <fieldset>
+      <legend>How soon is food needed?</legend>
+      {% for value,label in [('now','Now'),('today','Today'),('this_week','This week'),('planning','Planning ahead')] %}
+      <label class="choice"><input type="radio" name="urgency" value="{{ value }}" {% if (profile.value('urgency') or 'today') == value %}checked{% endif %}> {{ label }}</label>
+      {% endfor %}
+    </fieldset>
+    <label>Language, mobility, dietary, or accessibility needs <span class="optional">optional</span>
+      <textarea name="accessibility_needs" rows="3" placeholder="Example: Spanish, wheelchair access, no cooking facilities">{{ profile.value('accessibility_needs') or '' }}</textarea>
+    </label>
+    <button class="button primary" type="submit">Show food options now</button>
+  </form>
+</section>
+{% endblock %}

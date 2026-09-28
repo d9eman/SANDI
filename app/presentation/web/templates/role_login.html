@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ role_title }} login | SANDI Demo{% endblock %}
+{% block content %}
+<section class="narrow-page">
+  <p class="eyebrow">Protected demonstration workspace</p>
+  <h1>{{ role_title }} login</h1>
+  <p>{{ explanation }}</p>
+  {% if error %}<div class="notice danger">{{ error }}</div>{% endif %}
+  {% if demo_credentials %}
+  <div class="notice"><strong>Local demo:</strong> username <code>{{ demo_credentials.username }}</code>, password <code>{{ demo_credentials.password }}</code>.</div>
+  {% endif %}
+  <form method="post" action="{{ action }}" class="card stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Username<input name="username" autocomplete="username" required></label>
+    <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+    <button class="button primary" type="submit">Sign in</button>
+  </form>
+  <p class="field-note">After editing <code>.env</code>, fully stop and restart the app. Browser Basic-Auth caching is no longer used in version 2.</p>
+</section>
+{% endblock %}

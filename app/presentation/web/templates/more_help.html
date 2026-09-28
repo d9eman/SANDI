@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}More food help | SANDI Demo{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Profile step 2 — applications and connection</p>
+    <h1>Get help beyond today’s food map</h1>
+    <p>These routes help with applications, benefit navigation, and case follow-up. They are separate from immediate distribution maps.</p>
+  </div>
+  <a class="button secondary" href="/p/{{ profile.profile_id }}/resources">Back to food maps</a>
+</section>
+
+<section class="card callout two-column">
+  <div>
+    <h2>Screen several food pathways once</h2>
+    <p>SANDI reuses shared profile answers and shows why each pre-screen result was produced. The responsible agency still makes the official decision.</p>
+  </div>
+  <div class="stack actions-panel">
+    <a class="button primary" href="/p/{{ profile.profile_id }}/questions">Continue optional screening</a>
+    <a class="button secondary" href="/p/{{ profile.profile_id }}/results">See current results</a>
+  </div>
+</section>
+
+<section class="section-heading"><div><p class="eyebrow">Application and navigation routes</p><h2>Choose the kind of help you need</h2></div></section>
+<div class="resource-grid">
+{% for item in resources %}
+  <article class="card resource-card">
+    <div class="card-topline"><span class="badge">{{ item.service_mode.replace('_',' ') }}</span><span class="muted">{{ item.data_quality_status.replace('_',' ') }}</span></div>
+    <h2>{{ item.service_name }}</h2>
+    <p class="provider-byline">Provided by <strong>{{ item.provider_name }}</strong></p>
+    <p>{{ item.service_description }}</p>
+    <dl class="details">
+      <div><dt>Who can ask</dt><dd>{{ item.eligibility_summary or 'Open navigation; program rules apply later.' }}</dd></div>
+      <div><dt>Contact</dt><dd>{{ item.phone or 'Use official link' }}</dd></div>
+      <div><dt>Important</dt><dd>{{ item.documentation_notes or 'Verify the current process with the organization.' }}</dd></div>
+    </dl>
+    <a class="button primary" href="/go/{{ item.service_id }}?location={{ profile.value('zip_code') or '' }}" target="_blank" rel="noopener">Open this next step</a>
+    {% set location = profile.value('zip_code') or '' %}
+    {% include "_resource_feedback.html" %}
+    {% if item.referral_enabled %}
+      <form method="post" action="/p/{{ profile.profile_id }}/referrals" class="stack compact-form">
+        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+        <input type="hidden" name="provider_id" value="{{ item.provider_id }}">
+        <input type="hidden" name="service_id" value="{{ item.service_id }}">
+        <label class="choice consent"><input type="checkbox" name="consent" value="yes" required> I consent to share a minimal food-referral summary.</label>
+        <button class="button secondary" type="submit">Request provider follow-up</button>
+      </form>
+    {% else %}
+      <p class="field-note">SANDI currently records the handoff but cannot submit directly until this organization approves a referral workflow.</p>
+    {% endif %}
+  </article>
+{% else %}
+  <div class="notice">No public assistance routes are active.</div>
+{% endfor %}
+</div>
+
+<section class="card callout two-column">
+  <div><h2>Cannot complete an application alone?</h2><p>Create a general navigation ticket. This demo records the request while the team develops provider-approved routing.</p></div>
+  <form method="post" action="/p/{{ profile.profile_id }}/referrals" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label class="choice consent"><input type="checkbox" name="consent" value="yes" required> I consent to save a general food-navigation ticket.</label>
+    <button class="button secondary" type="submit">Create general help ticket</button>
+  </form>
+</section>
+{% endblock %}

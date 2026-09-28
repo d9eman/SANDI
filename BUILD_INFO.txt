@@ -1,0 +1,4 @@
+SANDI Food & Eligibility Demo v4.4
+45 automated tests passing.
+UI overlap/rule-maintenance hotfix + code-handoff refactor.
+See docs/CODE_MAP.md and docs/V4_4_READABILITY_AND_UI_FIXES.md.

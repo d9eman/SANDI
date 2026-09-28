@@ -1,0 +1,50 @@
+{
+  "program": {
+    "id": "direct_food",
+    "name": "Food resources and navigation",
+    "description": "Live locator links, application help, and provider records.",
+    "display_priority": 1,
+    "access_score": 100,
+    "actions": [
+      {
+        "service_id": "svc_feeding_sd_locator",
+        "label": "Find food now",
+        "kind": "primary"
+      },
+      {
+        "service_id": "svc_sd_food_bank_locator",
+        "label": "Open another food map",
+        "kind": "secondary"
+      }
+    ]
+  },
+  "versions": [
+    {
+      "id": "direct-food-catalog-v2",
+      "effective_from": "2026-08-01",
+      "effective_to": null,
+      "review_due": "2026-11-01",
+      "source_label": "SANDI provider catalog with source and verification metadata",
+      "source_url": "",
+      "notice": "Directory and navigation match only. Verify each site's hours, inventory, and requirements before travel.",
+      "pass_status": "DIRECT_RESOURCE",
+      "unknown_status": "DIRECT_RESOURCE",
+      "fail_status": "DIRECT_RESOURCE",
+      "expression": {
+        "type": "always",
+        "pass_reason": "Food navigation can be shown without a formal eligibility screen."
+      },
+      "next_steps": {
+        "DIRECT_RESOURCE": "Open a live locator, contact a navigation partner, or create a general food-help ticket."
+      },
+      "result_summaries": {
+        "DIRECT_RESOURCE": "Available to everyone without completing the eligibility survey.",
+        "LIKELY_ELIGIBLE": "Your current answers meet every rule included in this pre-screen. The official agency still decides.",
+        "MAY_QUALIFY": "Your current answers make this a useful next step, but the provider or agency must confirm remaining requirements.",
+        "NEEDS_INFORMATION": "A small number of unanswered items could change this result.",
+        "LIKELY_NOT_ELIGIBLE": "At least one current answer does not meet this pre-screen. Open the details to compare what was expected with what you entered.",
+        "RULE_UNDER_REVIEW": "SANDI will not rely on this rule until its owner reviews the current version."
+      }
+    }
+  ]
+}
